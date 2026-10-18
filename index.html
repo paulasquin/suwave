@@ -3,13 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Showcase kit — pages projet en 3D</title>
-  <meta name="description" content="Un modèle pour raconter un projet avec des scènes 3D pilotées par le défilement, un journal bilingue et une vidéo verticale.">
-  <meta name="theme-color" content="#03050b">
-  <!-- Replace with the site's address. -->
-  <link rel="alternate" hreflang="fr" href="https://example.paulasquin.com/?lang=fr">
-  <link rel="alternate" hreflang="en" href="https://example.paulasquin.com/?lang=en">
-  <link rel="alternate" hreflang="x-default" href="https://example.paulasquin.com/">
+  <title>SUWAVE — prévoir la dérive d'un drone solaire posé sur un lac</title>
+  <meta name="description" content="Stage de l'été 2017 à Sherbrooke : mesurer la dérive d'une aile volante solaire posée sur les lacs du Québec et calculer le point de pose qui la garde sur l'eau pendant toute sa recharge.">
+  <meta name="theme-color" content="#070b10">
+  <meta property="og:title" content="SUWAVE — se poser au bon endroit">
+  <meta property="og:description" content="Une aile volante solaire se pose sur un lac pour recharger. Où la poser pour que le vent ne la pousse pas sur la berge ?">
+  <meta property="og:image" content="https://suwave.paulasquin.com/assets/og.jpg">
+  <meta property="og:url" content="https://suwave.paulasquin.com/">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="alternate" hreflang="fr" href="https://suwave.paulasquin.com/?lang=fr">
+  <link rel="alternate" hreflang="en" href="https://suwave.paulasquin.com/?lang=en">
+  <link rel="alternate" hreflang="x-default" href="https://suwave.paulasquin.com/">
   <script>
     // Pick the language before first paint: ?lang=, then the visitor's saved choice, then the browser languages.
     (function () {
@@ -26,7 +30,7 @@
       document.documentElement.lang = lang || 'en';
     })();
   </script>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><radialGradient id='g'><stop offset='0' stop-color='%23e9fbff'/><stop offset='.45' stop-color='%236fd6ff'/><stop offset='1' stop-color='%236fd6ff' stop-opacity='0'/></radialGradient></defs><circle cx='32' cy='32' r='30' fill='url(%23g)'/><circle cx='32' cy='32' r='7' fill='%23fff'/></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><radialGradient id='g'><stop offset='0' stop-color='%23fff3dc'/><stop offset='.5' stop-color='%23ffb45e'/><stop offset='1' stop-color='%23ffb45e' stop-opacity='0'/></radialGradient></defs><circle cx='32' cy='26' r='22' fill='url(%23g)'/><path d='M6 40 L32 31 L58 40 L32 36 Z' fill='%23e9f1f4'/><path d='M4 50 Q18 45 32 50 T60 50' stroke='%2367d8d0' stroke-width='3' fill='none'/></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@300;500;700&display=swap" rel="stylesheet">
@@ -45,9 +49,9 @@
     <div class="loader-inner">
       <div class="loader-gauge">
         <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" class="lg-track"/><circle cx="60" cy="60" r="52" class="lg-fill" id="loader-arc"/></svg>
-        <div class="loader-readout"><span id="loader-num">100</span><small>%</small></div>
+        <div class="loader-readout"><span id="loader-num">0</span><small>%</small></div>
       </div>
-      <p class="loader-label" data-i18n="loader">Chargement de la scène…</p>
+      <p class="loader-label" data-i18n="loader">Recharge en cours…</p>
     </div>
   </div>
 
@@ -57,96 +61,202 @@
   <div class="scroll-progress" aria-hidden="true"><span></span></div>
 
   <nav class="topnav" aria-label="Navigation principale" data-i18n-aria="nav.aria">
-    <a href="#top" class="brand"><span class="brand-ion"></span><span data-i18n="brand">Showcase kit</span></a>
+    <a href="#top" class="brand"><span class="brand-ion"></span><span>SUWAVE</span></a>
     <div class="nav-links">
       <a href="#histoire" data-i18n="nav.story">Histoire</a>
-      <a href="#modele" data-i18n="nav.model">Modèle</a>
+      <a href="#aile" data-i18n="nav.wing">L'aile</a>
+      <a href="#derive" data-i18n="nav.drift">La dérive</a>
+      <a href="#ancre" data-i18n="nav.anchor">L'ancre</a>
       <a href="#journal" data-i18n="nav.journal">Journal</a>
       <a href="#resultats" data-i18n="nav.results">Résultats</a>
-      <a href="#kit" data-i18n="nav.kit">Kit</a>
+      <a href="#equipe" data-i18n="nav.team">Équipe</a>
     </div>
     <div class="lang-switch" role="group" aria-label="Langue / Language"><button data-lang="fr" lang="fr">FR</button><button data-lang="en" lang="en">EN</button></div>
     <button class="nav-toggle" aria-label="Menu" aria-expanded="false"><span></span><span></span></button>
   </nav>
 
   <main>
-    <!-- ACT · intro (js/acts/intro.js). One .panel per step; the act's progress is the scroll through this section. -->
-    <section id="top" class="act" data-act="intro">
+    <!-- ACT I · lake (js/acts/lake.js): golden hour, the wing lands on Lac Montjoie. 3 panels. -->
+    <section id="top" class="act" data-act="lake">
       <div class="panel panel-hero">
         <div class="hero-content">
-          <p class="eyebrow"><span class="pulse-dot"></span><span data-i18n="hero.eyebrow">Modèle · 3D pilotée par le défilement</span></p>
-          <h1 class="hero-title" data-i18n-title>
-            <span class="ht-line"><span class="ht-word" data-i18n="hero.t1">Projet</span></span>
-            <span class="ht-line"><span class="ht-word ht-glow" data-i18n="hero.t2">vitrine</span></span>
+          <p class="eyebrow"><span class="pulse-dot"></span><span data-i18n="hero.eyebrow">Stage · Sherbrooke, Québec · été 2017</span></p>
+          <h1 class="hero-title">
+            <span class="ht-line"><span class="ht-word" data-i18n="hero.t1">prévoir</span></span>
+            <span class="ht-line"><span class="ht-word ht-glow" data-i18n="hero.t2">la dérive</span></span>
           </h1>
-          <p class="hero-sub" data-i18n="hero.sub">Raconter un projet avec des scènes 3D qui suivent le défilement, un journal bilingue et des données réelles.</p>
+          <p class="hero-sub" data-i18n="hero.sub">SUWAVE est un drone solaire qui se pose sur les lacs pour recharger ses batteries. Pendant mon stage, j'ai mesuré jusqu'où le vent l'emporte, puis écrit le programme qui choisit où le poser pour qu'il reste sur l'eau toute la durée de la recharge.</p>
           <dl class="hero-kpis">
-            <div><dt data-i18n="hero.k1">actes</dt><dd><span data-count="2">2</span></dd></div>
-            <div><dt data-i18n="hero.k2">langues</dt><dd><span data-count="2">2</span></dd></div>
-            <div><dt data-i18n="hero.k3">images par seconde</dt><dd><span data-count="60">60</span></dd></div>
+            <div><dt data-i18n="hero.k1">de la vitesse du vent</dt><dd><span data-count="5">5</span><small>%</small></dd></div>
+            <div><dt data-i18n="hero.k2">de recharge en plein soleil</dt><dd><span data-count="3">3</span><small>h</small></dd></div>
+            <div><dt data-i18n="hero.k3">essais de dérive sur lac</dt><dd><span data-count="4">4</span></dd></div>
           </dl>
           <div class="hero-cta">
-            <a href="#histoire" class="btn btn-primary" data-i18n="hero.cta1">Lire l'histoire</a>
-            <a href="#modele" class="btn btn-ghost" data-i18n="hero.cta2">Voir le modèle</a>
+            <a href="#derive" class="btn btn-primary" data-i18n="hero.cta1">Essayer l'algorithme</a>
+            <a href="#histoire" class="btn btn-ghost" data-i18n="hero.cta2">Lire l'histoire</a>
           </div>
         </div>
         <div class="scroll-cue" aria-hidden="true"><span></span><i data-i18n="hero.scroll">Défiler</i></div>
       </div>
       <div class="panel panel-right">
         <div class="card">
-          <p class="kicker" data-i18n="i1.k">Acte · 01</p>
-          <h2 data-i18n="i1.h">Chaque acte est une scène 3D.</h2>
-          <p data-i18n="i1.p">Sa section de la page est une piste : la parcourir fait avancer la caméra, les effets et les étiquettes de 0 à 1.</p>
+          <p class="kicker" data-i18n="l1.k">Le projet SUWAVE</p>
+          <h2 data-i18n="l1.h">Une aile volante qui se pose sur l'eau.</h2>
+          <p data-i18n="l1.p">À l'Institut interdisciplinaire d'innovation technologique (3IT) de l'Université de Sherbrooke, l'équipe d'Alexis Lussier-Desbiens conçoit SUWAVE : un drone autonome, une aile volante couverte de cellules solaires, capable de décoller d'un plan d'eau et de s'y poser.</p>
         </div>
       </div>
-      <div class="panel panel-left">
+      <div class="panel panel-left panel-sticky">
         <div class="card">
-          <p class="kicker" data-i18n="i2.k">Acte · 02</p>
-          <h2 data-i18n="i2.h">Les cartes se posent par-dessus.</h2>
-          <p data-i18n="i2.p">Chaque panneau porte une carte qui apparaît, reste puis s'efface, pendant que la scène cadre son sujet du côté opposé.</p>
+          <p class="kicker" data-i18n="l2.k">Le problème</p>
+          <h2 data-i18n="l2.h">Pendant la recharge, le vent l'emporte.</h2>
+          <p data-i18n="l2.p">Posée sur un lac, l'aile recharge ses batteries en 3 heures par ciel dégagé, bien plus longtemps sous les nuages. Pendant ce temps, le vent la pousse. Or un lac a des berges : échouée, ou arrêtée sous les arbres, l'aile ne peut plus ni se recharger ni redécoller.</p>
         </div>
       </div>
     </section>
 
-    <!-- Plain section: the stage fades out and stops rendering. -->
     <section id="histoire" class="section section-projet">
       <div class="wrap">
         <div class="split">
           <div>
             <p class="kicker" data-i18n="story.k">L'histoire</p>
-            <h2 class="h-xl" data-i18n="story.h">Des sections simples<br><em>entre les actes.</em></h2>
+            <h2 class="h-xl" data-i18n="story.h">Deux mois au Québec,<br><em>un lac à la fois.</em></h2>
           </div>
           <div>
-            <p class="lead" data-i18n="story.lead">Entre deux actes, des sections ordinaires prennent le relais : texte, frise, bandeau de photos. La scène 3D s'efface et cesse de calculer.</p>
-            <p data-i18n="story.p">Tout ce qui suit est rendu depuis content.js et content.en.js.</p>
+            <p class="lead" data-i18n="story.lead">À l'été 2017, élève ingénieur à l'École Centrale de Nantes, je rejoins Oneka Technologies, une jeune entreprise née d'un projet étudiant de l'Université de Sherbrooke et installée au 3IT. Ses stations dessalent l'eau de mer grâce à la houle ; associées aux drones SUWAVE, elles pourraient aider les secours à reconnaître des îles dévastées par un ouragan.</p>
+            <p data-i18n="story.p1">Le scénario : lancées depuis un bateau, les ailes volent d'île en île, filment les dégâts et transmettent leurs données à une station. Hors de portée d'une seule charge, elles se posent sur l'eau pour recharger au soleil. Au Québec, le même drone pourrait sauter de lac en lac pour analyser l'eau ou surveiller les forêts.</p>
+            <p data-i18n="story.p2">Ma mission : étudier la dérive de ces ailes posées sur l'eau et trouver comment en limiter les effets. J'ai mesuré cette dérive au cours de quatre essais sur trois lacs, écrit un programme qui l'anticipe et conçu des prototypes pour la freiner.</p>
           </div>
         </div>
         <ol class="timeline" id="timeline"></ol>
+        <div class="photo-strip">
+          <figure class="ph" data-lightbox="story"><img src="assets/photos/vol-solaire-s.webp" data-full="assets/photos/vol-solaire.webp" alt="Richard-Alexandre Péloquin tient l'aile solaire avant un vol d'essai" data-i18n-alt="story.ph1" loading="lazy"><figcaption data-i18n="story.ph1">Richard-Alexandre Péloquin tient l'aile solaire avant un vol d'essai, le 5 juillet</figcaption></figure>
+          <figure class="ph ph-b" data-lightbox="story"><img src="assets/photos/canot-s.webp" data-full="assets/photos/canot.webp" alt="En canot vers le centre du lac des Nations pour y poser une aile" data-i18n-alt="story.ph2" loading="lazy"><figcaption data-i18n="story.ph2">En canot vers le centre du lac des Nations pour y poser une aile, le 26 juillet</figcaption></figure>
+          <figure class="ph" data-lightbox="story"><img src="assets/photos/ailes-derive-s.webp" data-full="assets/photos/ailes-derive.webp" alt="Deux ailes de dérive sur le lac à la Truite" data-i18n-alt="story.ph3" loading="lazy"><figcaption data-i18n="story.ph3">Deux ailes laissées à la dérive sur le lac à la Truite, le 2 août</figcaption></figure>
+        </div>
       </div>
     </section>
 
-    <!-- ACT · model (js/acts/model.js), 3 panels. -->
-    <section id="modele" class="act" data-act="model">
+    <!-- ACT II · wing (js/acts/wing.js): hot-wire cut, solar cells, electronics, take-off pivot. 4 panels. -->
+    <section id="aile" class="act" data-act="wing">
       <div class="panel panel-left">
         <div class="card">
-          <p class="kicker" data-i18n="m1.k">Le modèle · 01</p>
-          <h2 data-i18n="m1.h">Imprimé couche par couche</h2>
-          <p data-i18n="m1.p">Un GLB chargé depuis assets/models, révélé par layerReveal() de kit/fx.js.</p>
-          <div class="meter" aria-hidden="true"><span data-i18n="m1.layer">couche</span><b id="layer">0</b><span>/ 400</span></div>
+          <p class="kicker" data-i18n="w1.k">L'aile · 01</p>
+          <h2 data-i18n="w1.h">Taillée dans la mousse, au fil chaud</h2>
+          <p data-i18n="w1.p">Richard-Alexandre Péloquin m'a montré le procédé de l'équipe : un panneau de mousse isolante, des profils en bois posés sur la tranche, un fil chauffé à 20 V et 4 A qui les suit en fendant la mousse. Nous avons ainsi fabriqué trois ailes de dérive, de même géométrie que les modèles volants mais sans moteur ni hélice.</p>
+          <div class="meter" aria-hidden="true"><span data-i18n="w1.meter">découpe</span><b id="cut">0</b><span>%</span></div>
         </div>
       </div>
       <div class="panel panel-right">
         <div class="card">
-          <p class="kicker" data-i18n="m2.k">Le modèle · 02</p>
-          <h2 data-i18n="m2.h">Des étiquettes sur la pièce</h2>
-          <p data-i18n="m2.p">Des étiquettes HTML ancrées à des points du maillage, maintenues à l'écran et masquées derrière la caméra.</p>
+          <p class="kicker" data-i18n="w2.k">L'aile · 02</p>
+          <h2 data-i18n="w2.h">Un mètre d'envergure, des cellules solaires</h2>
+          <p data-i18n="w2.p">Le modèle volant de l'équipe mesure un mètre d'envergure pour environ 700 g. En plein soleil, la version qui volait à mon arrivée se rechargeait en 3 heures. En veille, elle ne consomme presque rien et peut donc recharger lentement, même par temps couvert.</p>
+        </div>
+      </div>
+      <div class="panel panel-left">
+        <div class="card">
+          <p class="kicker" data-i18n="w3.k">L'aile · 03</p>
+          <h2 data-i18n="w3.h">L'électronique à bord</h2>
+          <p data-i18n="w3.p">Un contrôleur de vol PixHawk sous PX4, une batterie LiPo, un GPS, une radio de télémétrie à 915 MHz et un interrupteur d'armement. Sur les ailes de dérive, un tube de Pitot devait mesurer le vent : grâce à ses winglets, l'aile se tourne d'elle-même face au vent.</p>
+        </div>
+      </div>
+      <div class="panel panel-right panel-sticky">
+        <div class="card">
+          <p class="kicker" data-i18n="w4.k">L'aile · 04</p>
+          <h2 data-i18n="w4.h">Redécoller depuis l'eau</h2>
+          <p data-i18n="w4.p">Pour repartir, le moteur bascule sur un pivot et l'hélice tire l'aile à la verticale. Ce mécanisme était le travail de Richard-Alexandre ; Étienne Tétreault améliorait le profil et l'étanchéité, Gabriel Guilmain programmait le décollage et l'atterrissage automatiques.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACT III · drift (js/acts/drift.js): real tracks, forecast, zones, landing point, then interactive. 5 panels. -->
+    <section id="derive" class="act act-drift" data-act="drift">
+      <div class="panel panel-left">
+        <div class="card">
+          <p class="kicker" data-i18n="d1.k">La dérive · 01</p>
+          <h2 data-i18n="d1.h">Le vent l'emporte, à 5 % de sa vitesse</h2>
+          <p data-i18n="d1.p">Nous avons laissé dériver les ailes sur trois lacs en enregistrant leur position GPS chaque seconde. Le courant des lacs traversés par une rivière s'est révélé négligeable : l'aile part dans le sens du vent, à environ 5 % de sa vitesse. Ici, les trajectoires réelles de trois ailes sur le lac Montjoie, le 16 août 2017, par un vent d'environ 6 m/s.</p>
+          <div class="readout" id="d1-out"></div>
+        </div>
+      </div>
+      <div class="panel panel-right">
+        <div class="card">
+          <p class="kicker" data-i18n="d2.k">La dérive · 02</p>
+          <h2 data-i18n="d2.h">Lire la prévision du vent</h2>
+          <p data-i18n="d2.p">Mon programme téléchargeait les prévisions Windfinder de la station météo la plus proche, un vecteur de vent toutes les trois heures, et les rangeait dans une base SQLite. Pour une recharge donnée, chaque vecteur compte pour le temps passé sous son effet : la dérive prévue est la somme de 5 % × vent × durée.</p>
+          <p class="formula-line"><span class="formula">d = Σ 0,05 · v<sub>i</sub> · Δt<sub>i</sub></span></p>
+        </div>
+      </div>
+      <div class="panel panel-left">
+        <div class="card">
+          <p class="kicker" data-i18n="d3.k">La dérive · 03</p>
+          <h2 data-i18n="d3.h">Trouver la place sur le lac</h2>
+          <p data-i18n="d3.p">Le projet GEGI, mené par d'anciens stagiaires, couvre le Québec d'un maillage de points qui indique s'ils sont dans un lac. À partir de ces points, le programme construit les plus grands rectangles d'eau libre (290 pour le lac Montjoie), puis retient celui qui contient le mieux le rectangle balayé par la dérive.</p>
+        </div>
+      </div>
+      <div class="panel panel-right">
+        <div class="card">
+          <p class="kicker" data-i18n="d4.k">La dérive · 04</p>
+          <h2 data-i18n="d4.h">Se poser au vent, dériver à l'abri</h2>
+          <p data-i18n="d4.p">La trajectoire est centrée dans ce rectangle : son point de départ devient le point de pose, du côté d'où vient le vent. L'aile traverse alors le lac pendant toute la recharge sans atteindre la berge. Si aucun rectangle n'est assez grand, le programme le signale : il faudra redécoller avant la berge, ou se repositionner sur le lac.</p>
+          <div class="charge" aria-hidden="true"><span data-i18n="d4.charge">recharge</span><i><b id="charge-bar"></b></i><em id="charge-num">0 %</em><small id="charge-clock">9 h 30</small></div>
+        </div>
+      </div>
+      <div class="panel panel-left panel-sticky panel-lab">
+        <div class="card card-lab" id="lab">
+          <p class="kicker" data-i18n="d5.k">À vous de jouer</p>
+          <h2 data-i18n="d5.h">Choisissez le vent</h2>
+          <div class="lab">
+            <div class="lab-row"><span data-i18n="d5.lake">Lac</span>
+              <div class="seg" role="radiogroup" id="lab-lake"><button class="on" data-v="montjoie">Montjoie</button><button data-v="truite" data-i18n="d5.truite">à la Truite</button></div>
+            </div>
+            <div class="lab-row"><span data-i18n="d5.mode">Vent</span>
+              <div class="seg" role="radiogroup" id="lab-mode"><button class="on" data-v="const" data-i18n="d5.const">constant</button><button data-v="forecast" data-i18n="d5.forecast">prévision de sept. 2017</button></div>
+            </div>
+            <div class="lab-wind" id="lab-const">
+              <div class="dial" id="lab-dial" role="slider" tabindex="0" aria-label="Direction d'où vient le vent" data-i18n-aria="d5.dir" aria-valuemin="0" aria-valuemax="359"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" class="dial-ring"/><g class="dial-ticks"></g><text x="60" y="17">N</text><text x="105" y="64">E</text><text x="60" y="111">S</text><text x="15" y="64" data-i18n="d5.west">O</text><g class="dial-arrow"><line x1="60" y1="28" x2="60" y2="88"/><path d="M60 96 L52 82 L68 82 Z"/></g></svg></div>
+              <div class="lab-sliders">
+                <label><span data-i18n="d5.from">vent venant du</span><b id="lab-dir-out">–</b></label>
+                <label><span data-i18n="d5.speed">vitesse</span><input type="range" id="lab-speed" min="0.5" max="8" step="0.5" value="2"><b id="lab-speed-out">2 m/s</b></label>
+              </div>
+            </div>
+            <div class="lab-row" id="lab-fc" hidden><span data-i18n="d5.start">Début</span><input type="range" id="lab-start" min="0" max="30" step="0.5" value="26.5"><b id="lab-start-out"></b></div>
+            <div class="lab-row"><span data-i18n="d5.dur">Recharge</span><input type="range" id="lab-dur" min="0.5" max="9" step="0.5" value="3"><b id="lab-dur-out">3 h</b></div>
+            <div class="lab-out">
+              <div><small data-i18n="d5.o1">dérive prévue</small><b id="o-drift">–</b></div>
+              <div><small data-i18n="d5.o2">zones assez grandes</small><b id="o-fits">–</b></div>
+              <div><small data-i18n="d5.o3">point de pose</small><b id="o-gps">–</b></div>
+            </div>
+            <p class="lab-status" id="o-status"></p>
+            <button class="btn btn-ghost btn-sm" id="lab-replay" data-i18n="d5.replay">Rejouer la recharge</button>
+            <p class="lab-foot" data-i18n="d5.foot">L'algorithme de 2017, réécrit en JavaScript. Zones et prévisions viennent de sa base de données ; contours des lacs © OpenStreetMap.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACT IV · anchor (js/acts/anchor.js): the scissor deployment mechanism from the original parts. 3 panels. -->
+    <section id="ancre" class="act" data-act="anchor">
+      <div class="panel panel-left">
+        <div class="card">
+          <p class="kicker" data-i18n="a1.k">L'ancre · 01</p>
+          <h2 data-i18n="a1.h">Freiner la dérive</h2>
+          <p data-i18n="a1.p">Prévoir ne suffit pas toujours. J'ai aussi travaillé sur des solutions physiques : des ancres flottantes, des panneaux qui freinent l'aile en prenant appui sur l'eau, et des WaveGliders inspirés de ceux de Liquid Robotics, qui transforment le mouvement vertical de la houle en déplacement horizontal. L'occasion d'apprendre la découpeuse laser Trotec Speedy 300 et l'imprimante composite MarkForged.</p>
+        </div>
+      </div>
+      <div class="panel panel-right">
+        <div class="card">
+          <p class="kicker" data-i18n="a2.k">L'ancre · 02</p>
+          <h2 data-i18n="a2.h">Imprimé, découpé, assemblé</h2>
+          <p data-i18n="a2.p">Une ancre flottante doit pouvoir se ranger dans l'aile sans trop gêner le vol. J'ai dessiné sous SolidWorks un système de déploiement à croisillons : sabot et axes imprimés en 3D, bras découpés au laser, arrêts en translation assurés par des goupilles en fil de fer. Les pièces affichées ici sont celles de 2017.</p>
         </div>
       </div>
       <div class="panel panel-left panel-sticky">
         <div class="card">
-          <p class="kicker" data-i18n="m3.k">Le modèle · 03</p>
-          <h2 data-i18n="m3.h">Plateau tournant</h2>
-          <p data-i18n="m3.p">La caméra cadre le sujet à l'opposé de la carte ; en portrait, elle le remonte au-dessus des cartes.</p>
+          <p class="kicker" data-i18n="a3.k">L'ancre · 03</p>
+          <h2 data-i18n="a3.h">Déployée en 30 secondes</h2>
+          <p data-i18n="a3.p">Une vis sans fin entraînée par un servomoteur règle l'écart entre les deux axes supérieurs : toute la structure s'étend ou se replie, comme un miroir sur bras extensible. Commandé par le contrôleur de vol grâce à mon application embarquée, le système déploie l'ancre en 30 secondes. Trop encombrant pour l'aile, ce premier prototype a validé le principe.</p>
+          <div class="console" aria-hidden="true"><span>nsh&gt;</span> <b id="anchor-cmd">ancre desc</b> <em id="anchor-time">0 s</em></div>
         </div>
       </div>
     </section>
@@ -155,8 +265,8 @@
       <div class="wrap">
         <div class="section-head">
           <p class="kicker" data-i18n="jn.k">Journal</p>
-          <h2 class="h-xl" data-i18n="jn.h">Des entrées avec<br><em>des visualisations vivantes.</em></h2>
-          <p class="lead" data-i18n="jn.lead">Les courbes et les visualiseurs 3D ne sont construits qu'à leur arrivée à l'écran.</p>
+          <h2 class="h-xl" data-i18n="jn.h">Dix étapes,<br><em>du labo aux lacs.</em></h2>
+          <p class="lead" data-i18n="jn.lead">Tirées de mon journal de bord, de mes rapports d'expérience et des données d'origine : les courbes sont tracées à partir des journaux GPS des ailes et du tableau des coefficients de 2017.</p>
         </div>
         <div class="journal" id="journal-list"></div>
       </div>
@@ -166,27 +276,57 @@
       <div class="wrap">
         <div class="section-head">
           <p class="kicker" data-i18n="res.k">Résultats</p>
-          <h2 class="h-xl" data-i18n="res.h">Des chiffres<br><em>qui défilent.</em></h2>
-          <p class="lead" data-i18n="res.lead">Grille de chiffres et comparaison en barres, linéaire ou logarithmique.</p>
+          <h2 class="h-xl" data-i18n="res.h">Ce que les lacs<br><em>nous ont appris.</em></h2>
+          <p class="lead" data-i18n="res.lead">En deux mois, des mesures de terrain, un coefficient de dérive, un programme d'anticipation fonctionnel et plusieurs prototypes anti-dérive.</p>
         </div>
         <div class="results" id="stats"></div>
-        <div class="split split-top"><div></div><div id="bars"></div></div>
+        <div class="split split-top">
+          <div>
+            <h3 class="h-md" data-i18n="res.c.h">Vitesse de dérive et vitesse du vent</h3>
+            <p data-i18n="res.c.p">Chaque point est une session de dérive mesurée en 2017, d'après le tableau « Coefficients de déplacement ». Le vent n'était connu qu'au mètre par seconde près, par les stations Windfinder : d'où les colonnes de points. La droite à 5 % résume les essais du 2 et du 16 août ; ceux du 29 août, par vent très faible, dérivent plus vite que prévu.</p>
+            <div class="chart chart-big" id="coef-chart"></div>
+          </div>
+          <div>
+            <h3 class="h-md" data-i18n="res.b.h">Garder le contact avec l'aile</h3>
+            <p data-i18n="res.b.p">Pour retrouver une aile au milieu d'un grand lac, il fallait savoir jusqu'où porte sa radio. Posée au sol, l'aile se perd vite : l'eau et le sol obstruent la liaison. Un drone relais en vol stationnaire au-dessus de la station change tout.</p>
+            <div id="bars"></div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section id="kit" class="section section-tiles">
+    <section id="contexte" class="section section-tiles">
       <div class="wrap">
         <div class="section-head">
-          <p class="kicker" data-i18n="kit.k">Sous le capot</p>
-          <h2 class="h-xl" data-i18n="kit.h">Quatre briques<br><em>réutilisables.</em></h2>
+          <p class="kicker" data-i18n="ctx.k">Pourquoi des lacs</p>
+          <h2 class="h-xl" data-i18n="ctx.h">Du lac québécois<br><em>à l'archipel.</em></h2>
+          <p class="lead" data-i18n="ctx.lead">Un lac est une zone de dérive bornée : si l'on sait y rester, on sait choisir en mer une zone sûre, près d'une station relais ou d'un point de repêchage.</p>
         </div>
         <div class="tiles" id="tiles"></div>
+      </div>
+    </section>
+
+    <section id="equipe" class="section section-team">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="kicker" data-i18n="team.k">Équipe et remerciements</p>
+          <h2 class="h-xl" data-i18n="team.h">Avec la légendaire<br><em>bienveillance canadienne.</em></h2>
+          <p class="lead" data-i18n="team.lead">SUWAVE est le projet de l'équipe d'Alexis Lussier-Desbiens au 3IT. Ce site raconte ma partie, la dérive, réalisée avec l'aide précieuse de toutes ces personnes.</p>
+        </div>
+        <div class="team" id="team"></div>
+        <div class="sources">
+          <h3 class="h-md" data-i18n="src.h">Sources</h3>
+          <ul id="sources"></ul>
+        </div>
       </div>
     </section>
   </main>
 
   <footer class="footer">
-    <div class="wrap footer-inner"><p><span class="brand-ion"></span><span data-i18n="foot.1">Showcase kit · Paul Asquin</span></p></div>
+    <div class="wrap footer-inner">
+      <p><span class="brand-ion"></span><span data-i18n="foot.1">SUWAVE · stage de Paul Asquin, été 2017 · Oneka Technologies et 3IT, Université de Sherbrooke</span></p>
+      <p class="footer-small" data-i18n="foot.2">Modèle 3D de l'aile reconstitué à partir des plans et photos de l'équipe ; pièces du système d'ancre issues des fichiers d'origine. Contours des lacs © contributeurs OpenStreetMap.</p>
+    </div>
   </footer>
 
   <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo agrandie" data-i18n-aria="lb.aria" hidden>

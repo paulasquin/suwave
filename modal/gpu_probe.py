@@ -9,7 +9,7 @@ image = (
     .run_commands("playwright install --with-deps chromium")
     .env({"NVIDIA_DRIVER_CAPABILITIES": "all"})
 )
-app = modal.App("kit-gpu-probe", image=image)
+app = modal.App("suwave-gpu-probe", image=image)
 
 FLAG_SETS = {
     "angle-vulkan": ["--use-angle=vulkan", "--enable-features=Vulkan", "--ignore-gpu-blocklist", "--enable-gpu-rasterization"],
@@ -44,7 +44,7 @@ def probe(url: str, flag_set: str = "", shots: bool = False):
                 await pg.wait_for_function("document.getElementById('loader').classList.contains('done')", timeout=120000)
                 await pg.wait_for_timeout(3000)
                 fps = {}
-                for sel, frac in [("#top", 0.0), ("#top", 0.5), ("#modele", 0.15), ("#modele", 0.6), ("#modele", 0.95)]:  # adapt per site
+                for sel, frac in [("#top", 0.0), ("#top", 0.5), ("#aile", 0.3), ("#aile", 0.6), ("#derive", 0.1), ("#derive", 0.7), ("#derive", 0.92), ("#ancre", 0.85)]:  # adapt per site
                     y = await pg.evaluate(f"(()=>{{const e=document.querySelector('{sel}');const r=e.getBoundingClientRect();return r.top+scrollY+{frac}*(r.height-innerHeight);}})()")
                     await pg.evaluate(f"window.scrollTo(0,{y})")
                     await pg.wait_for_timeout(2500)

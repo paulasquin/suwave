@@ -17,7 +17,7 @@ export const PALETTE = {
 /**
  * Line chart from a config:
  *   { x: { label, min, max, ticks, unit, d }, y: { … },
- *     series: [{ name, color, data: [[x, y], …], dots, dash }],
+ *     series: [{ name, color, data: [[x, y], …], dots, dash, line }],   line: false = scatter
  *     notes: [{ x, y, text }] }
  * Returns { setReveal(0-1), play(seconds) } — the pen reveal can be driven by a 3D act.
  */
@@ -53,11 +53,18 @@ export function createChart(container, cfg) {
   cfg.series.forEach((s) => {
     const d = s.data.map(([x, y], i) => `${i ? 'L' : 'M'}${sx(x).toFixed(1)},${sy(y).toFixed(1)}`).join('');
     // Soft halo without an SVG/CSS blur filter: blur forces a costly repaint on every reveal step.
-    el('path', { d, class: 'series', stroke: s.color, 'stroke-width': 7, opacity: 0.08 }, plot);
-    el('path', { d, class: 'series', stroke: s.color, ...(s.dash ? { 'stroke-dasharray': s.dash } : {}) }, plot);
+    if (s.line !== false) {
+      el('path', { d, class: 'series', stroke: s.color, 'stroke-width': 7, opacity: 0.08 }, plot);
+      el('path', { d, class: 'series', stroke: s.color, ...(s.dash ? { 'stroke-dasharray': s.dash } : {}) }, plot);
+    }
     if (s.dots) {
+      // Scatter series (line: false) get bigger dots with a soft halo.
       const g = el('g', { class: 'dots' }, plot);
-      s.data.forEach(([x, y]) => el('circle', { cx: sx(x), cy: sy(y), r: 2.6, fill: s.color }, g));
+      const r = s.line === false ? 5 : 2.6;
+      s.data.forEach(([x, y]) => {
+        if (s.line === false) el('circle', { cx: sx(x), cy: sy(y), r: r * 2.2, fill: s.color, opacity: 0.12 }, g);
+        el('circle', { cx: sx(x), cy: sy(y), r, fill: s.color }, g);
+      });
     }
   });
   (cfg.notes || []).forEach((n) => {

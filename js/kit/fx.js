@@ -315,23 +315,28 @@ export class Labels {
  * Layer-by-layer reveal (3D printing look) for any Mesh*Material: fragments above
  * material.userData.uPrint (in the mesh's local Y units) are discarded, with a hot
  * glowing band at the cut while material.userData.uGlow is 1. Faint layer lines too.
+ * Options: axis ('x' | 'y' | 'z', local position) or attr (name of a float vertex attribute,
+ * e.g. a chord coordinate for a hot-wire cut), invert (keep what is above the cut instead),
+ * band (width of the glowing band, same units), lines (false to drop the layer lines).
  */
-export function layerReveal(material, { layer = 0.5 } = {}) {
-  material.userData.uPrint = { value: 1e9 };
+export function layerReveal(material, { layer = 0.5, axis = 'y', attr = null, invert = false, band = 1.6, lines = true } = {}) {
+  material.userData.uPrint = { value: invert ? -1e9 : 1e9 };
   material.userData.uGlow = { value: 0 };
+  const src = attr ? attr : `position.${axis}`;
   material.onBeforeCompile = (shader) => {
     shader.uniforms.uPrint = material.userData.uPrint;
     shader.uniforms.uGlow = material.userData.uGlow;
     shader.vertexShader = shader.vertexShader
-      .replace('#include <common>', '#include <common>\nvarying float vLocalY;')
-      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvLocalY = position.y;');
+      .replace('#include <common>', `#include <common>\nvarying float vLocalY;${attr ? `\nattribute float ${attr};` : ''}`)
+      .replace('#include <begin_vertex>', `#include <begin_vertex>\nvLocalY = ${src};`);
     shader.fragmentShader = shader.fragmentShader
       .replace('#include <common>', '#include <common>\nvarying float vLocalY;\nuniform float uPrint;\nuniform float uGlow;')
-      .replace('#include <clipping_planes_fragment>', '#include <clipping_planes_fragment>\nif (vLocalY > uPrint) discard;')
-      .replace('#include <color_fragment>', `#include <color_fragment>\ndiffuseColor.rgb *= 0.975 + 0.025 * sin(vLocalY * ${(6.2832 / layer).toFixed(4)});`)
+      .replace('#include <clipping_planes_fragment>', `#include <clipping_planes_fragment>\nif (${invert ? 'vLocalY < uPrint' : 'vLocalY > uPrint'}) discard;`)
+      .replace('#include <color_fragment>', `#include <color_fragment>${lines ? `\ndiffuseColor.rgb *= 0.975 + 0.025 * sin(vLocalY * ${(6.2832 / layer).toFixed(4)});` : ''}`)
       .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
-        float band = smoothstep(1.6, 0.0, uPrint - vLocalY) * uGlow;
+        float band = smoothstep(${band.toFixed(4)}, 0.0, abs(uPrint - vLocalY)) * uGlow;
         totalEmissiveRadiance += mix(vec3(1.0, 0.45, 0.12), vec3(1.0, 0.85, 0.6), band) * band * 2.2;`);
   };
+  material.customProgramCacheKey = () => `reveal-${src}-${invert}-${band}-${lines}`;
   return material;
 }

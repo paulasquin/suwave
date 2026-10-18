@@ -1,8 +1,8 @@
-# Showcase kit
+# SUWAVE showcase site
 
-Template for project showcase sites (scroll-driven three.js acts, bilingual, journal, vertical video). Read README.md first: it holds the recipe, the act contract, the testing routine and the pitfalls already paid for.
+Built from `paulasquin/showcase-kit`; read README.md (this repo) then the kit's README for the act contract and the pitfalls.
 
-- Code, comments and docs in English; site copy in French (default, in index.html and content.js) and English (strings.js, content.en.js).
-- `js/kit/` is shared code: improve it here rather than diverging in a project copy, and port fixes back.
-- Validate 3D on a real GPU (modal/) and on a phone profile before calling a site done; SwiftShader hides NaN shader bugs.
-- Heavy work (GPU renders, video capture, big builds) goes to the Mac session `mac-guardia` when it is available, otherwise to an ephemeral Modal machine (workspace `photomate`).
+- Code, comments and docs in English; site copy in French (index.html, js/content.js) and English (js/strings.js `static`, js/content.en.js). First person for Paul, never "tu".
+- Every fact must come from the 2017 sources (report, logbook, trial reports, data files); do not invent numbers. SUWAVE is the 3IT team's project (Alexis Lussier-Desbiens); Paul's part is the drift study.
+- `js/kit/` is shared with the kit: improve it there too (`~/code/showcase-kit`).
+- Validate 3D on a real GPU (modal/) and a phone profile; SwiftShader hides bloom and NaN problems.

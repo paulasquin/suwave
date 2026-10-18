@@ -7,9 +7,9 @@ image = (
     .run_commands("playwright install --with-deps chromium")
     .env({"NVIDIA_DRIVER_CAPABILITIES": "all"})
 )
-app = modal.App("kit-mobile-probe", image=image)
+app = modal.App("suwave-mobile-probe", image=image)
 # Positions to measure: (section selector, fraction of the scroll through it). Adapt per site.
-POS = [("#top", 0), ("#top", 0.5), ("#modele", 0.15), ("#modele", 0.6), ("#modele", 0.95)]
+POS = [("#top", 0.0), ("#top", 0.5), ("#aile", 0.3), ("#aile", 0.6), ("#derive", 0.1), ("#derive", 0.7), ("#derive", 0.92), ("#ancre", 0.85)]
 PROFILES = {
     "pixel7": dict(viewport={"width": 412, "height": 915}, device_scale_factor=2.625, is_mobile=True, has_touch=True,
                    user_agent="Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36"),

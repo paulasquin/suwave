@@ -1,5 +1,6 @@
 """Render one act at given progress values with the page UI hidden (local Chromium, software WebGL).
-Usage: shot3d.py out_prefix act p1 p2 ... [--ui] [--w=1440 --h=900] [--url=http://127.0.0.1:8000/]
+Usage: shot3d.py out_prefix act p1 p2 ... [--ui] [--w=1440 --h=900] [--url=http://127.0.0.1:8000/] [--eval="a.look.bloom = 0"]
+--eval runs after each setProgress with `a` bound to the act (handy to test look settings).
 The page must expose window.__kit (?debug) — see js/main.js."""
 import asyncio, sys
 from playwright.async_api import async_playwright
@@ -9,7 +10,7 @@ P = os.environ.get('CHROME') or (glob.glob(os.path.expanduser('~/.cache/ms-playw
 
 async def main():
     args = [a for a in sys.argv[1:] if not a.startswith('--')]
-    flags = dict(a[2:].split('=') if '=' in a else (a[2:], '1') for a in sys.argv[1:] if a.startswith('--'))
+    flags = dict(a[2:].split('=', 1) if '=' in a else (a[2:], '1') for a in sys.argv[1:] if a.startswith('--'))
     prefix, act, *ps = args
     w, h = int(flags.get('w', 1440)), int(flags.get('h', 900))
     async with async_playwright() as p:
@@ -29,6 +30,7 @@ async def main():
               B.stage.setActive('{act}'); a.setProgress({pr});
               if (a.intro !== undefined) a.t0 = performance.now() - 60000;
               if (a.enterTime !== undefined) a.enterAt = performance.now() - 5000;
+              {flags.get('eval', '')}
             }})()""")
             await pg.wait_for_timeout(int(flags.get('wait', 3000)))
             await pg.screenshot(path=f'{prefix}-{i:02d}.png', timeout=240000)
