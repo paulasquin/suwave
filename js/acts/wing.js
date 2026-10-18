@@ -138,9 +138,10 @@ export class WingAct {
     // Panel 4: the motor pivots up and the prop pulls the wing to the vertical.
     const piv = smooth(0.05, 0.4, ph(3));
     const lift = smooth(0.35, 0.95, ph(3));
-    if (P.pivot) P.pivot.rotation.x = -piv * Math.PI / 2;
     if (P.prop) P.prop.rotation.z = lift > 0 ? t * 70 : 0;
     this.root.rotation.x = -lift * Math.PI / 2 * 0.92;
+    // The thrust stays vertical while the wing rises: the pivot folds back as the nose comes up.
+    if (P.pivot) P.pivot.rotation.x = -piv * Math.PI / 2 - this.root.rotation.x;
     this.root.position.y = lift * 0.25 + Math.sin(t * 2) * 0.004 * lift;
     this.root.rotation.y = Math.sin(t * 0.25) * 0.08 * (1 - lift);
 

@@ -161,14 +161,16 @@ function winglet(side) {
   const sh = new THREE.Shape();
   sh.moveTo(0, 0); sh.lineTo(-TIP, 0); sh.lineTo(-TIP - 0.0, 0.12); sh.lineTo(-TIP + 0.06, 0.12); sh.lineTo(0, 0);
   const g = new THREE.ExtrudeGeometry(sh, { depth: 0.004, bevelEnabled: false });
-  g.rotateY(Math.PI / 2);
-  // Shape x (chord) now runs along -z… place the root at the tip leading edge.
+  g.rotateY(-Math.PI / 2);
+  // Shape x (chord) now runs along +z, the plate along -x: put the root on the tip chord,
+  // from the leading edge back, low enough to cover the tip profile.
   const { le } = planform(1);
-  g.translate(side * SPAN / 2 - 0.002, dihedral(1) + 0.004, le);
+  const y0 = dihedral(1) - 0.008;
+  g.translate(side * SPAN / 2 + 0.002, y0, le);
   // Sweep: leading edge leaning back.
   const p = g.attributes.position;
   for (let i = 0; i < p.count; i++) {
-    const y = p.getY(i) - dihedral(1) - 0.004;
+    const y = p.getY(i) - y0;
     p.setZ(i, p.getZ(i) - y * 0.5);
   }
   g.computeVertexNormals();

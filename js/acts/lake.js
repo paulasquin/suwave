@@ -103,8 +103,9 @@ export class LakeAct {
     const yaw = Math.atan2(dir.x, dir.z);
     const pitch = -Math.asin(THREE.MathUtils.clamp(dir.y, -1, 1)) + smooth(0.86, 0.97, s) * -0.45 * (1 - smooth(0.985, 1, s));
     this.path.getTangentAt(Math.min(0.999, u + 0.02), this.v3);
-    const turn = Math.atan2(this.v3.x, this.v3.z) - yaw;
-    const bank = THREE.MathUtils.clamp(Math.atan2(Math.sin(turn), Math.cos(turn)) * 4, -0.7, 0.7) * k * (1 - smooth(0.85, 0.95, s)) + (1 - k) * 0.35;
+    // Bank from the path's own curvature (the blend with the circle would read as a turn).
+    const turn = Math.atan2(this.v3.x, this.v3.z) - Math.atan2(this.v2.x, this.v2.z);
+    const bank = THREE.MathUtils.clamp(Math.atan2(Math.sin(turn), Math.cos(turn)) * 4, -0.7, 0.7) * k * (1 - smooth(0.85, 0.95, s)) - (1 - k) * 0.35;
     d.rotation.set(pitch, yaw, -bank, 'YXZ');
   }
 
