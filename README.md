@@ -42,4 +42,4 @@ Pitfalls met here: the sun disc and glints must stay moderate in HDR (bloom wash
 
 ## Video
 
-`video/` — 30 s vertical teaser (FR and EN) from the acts, see `video/README.md`.
+`video/` — the 60 s vertical film (FR and EN, embedded in the History section) and its tools, see `video/README.md`.

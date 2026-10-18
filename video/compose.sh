@@ -10,6 +10,6 @@ for spec in "fr:suwave-teaser-fr" "en:suwave-teaser-en"; do
   ffmpeg -hide_banner -loglevel error -y -i clean.mp4 -i music.wav \
     -filter_complex "[0:v]ass=captions_${lang}.ass:fontsdir=fonts/static,format=yuv420p[v]" \
     -map "[v]" -map 1:a -c:v libx264 -preset slow -crf 21 -maxrate 9M -bufsize 18M -profile:v high -level 4.2 -r 30 \
-    -c:a aac -b:a 256k -ar 48000 -t 30 -movflags +faststart "out/${name}.mp4"
+    -c:a aac -b:a 256k -ar 48000 -t 40 -movflags +faststart "out/${name}.mp4"
   echo "out/${name}.mp4 $(du -h "out/${name}.mp4" | cut -f1)"
 done

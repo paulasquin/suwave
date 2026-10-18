@@ -1,6 +1,6 @@
-# Vertical video (30 s, 1080×1920)
+# Vertical videos (1080×1920)
 
-A teaser rendered from the site's own 3D acts, with on-screen text in French and English and synthesised music. Used for ionic.paulasquin.com on Instagram and YouTube Shorts.
+The published film (60 s; YouTube Shorts FR zGIv8lolIcY, EN u364UX0FKJY, embedded in the History section) is the Claude Motion film "SUWAVE, prévoir la dérive": story shots rendered from the 3D acts with `capture.py`, the drift study as 2D scenes, and the `music.py` score (D minor, in the style of the ion thruster film) muxed in after the render. The scripts below also build an earlier 40 s teaser from the acts alone, with `captions.py` and `compose.sh`.
 
 All three parts share one grid: **96 BPM, one bar = 2.5 s, one shot per bar** (`SHOTS` in `capture.py`, `TEXT` in `captions.py`, the FX placements at the end of `music.py`).
 

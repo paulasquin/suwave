@@ -1,8 +1,8 @@
-"""Synthesize a 30 s calm, luminous track for the SUWAVE teaser (D major, 96 BPM, one bar = 2.5 s):
-golden-hour pads, a kalimba-like arpeggio, wind and water textures, a soft beat from 12.5 s,
-a bell melody over the drift map, a splash when the wing lands (8.9 s) and servo ticks under
-the anchor shot. Everything is generated here, so there is no licensing question. The
-structure follows the shot grid of capture.py; move the placements below to re-time accents.
+"""Synthesize the 60 s soundtrack of the SUWAVE film (D minor, 120 BPM, one bar = 2 s), in the
+style of the ion thruster film: detuned saw pads, a 16th-note arpeggio with ping-pong echo, a sub
+drone, risers into soft impacts and bells. No sound effects: the touchdowns and the take-off are
+marked by the music alone. Everything is generated here, so there is no licensing question.
+Sections follow the film's scenes (SC below), each with its own bar grid.
 
     uv run --with numpy --with scipy python music.py   # -> music.wav
 """
@@ -11,12 +11,20 @@ from scipy import signal
 from scipy.io import wavfile
 
 SR = 44100
-DUR = 30.0
+DUR = 60.0
 N = int(SR * DUR)
-BEAT = 60 / 96
+BEAT = 0.5
 BAR = 4 * BEAT
 rng = np.random.default_rng(7)
 t_all = np.arange(N) / SR
+
+# Scene starts in the film, and the moments the music marks.
+SC = dict(lac=0, aile=5, soleil=11, vent=16, mesure=21, cinq=27, prevision=32, zone=39, pose=45, repart=51, fin=55)
+TOUCH = SC['aile'] + 4.24
+FIVE = SC['cinq'] + 2.6
+VEC = (SC['prevision'] + 3.5, SC['prevision'] + 5.1)
+PICK = SC['zone'] + 4.9
+LAND = SC['pose'] + 1.1
 
 
 def mtof(m):
@@ -62,7 +70,7 @@ def place(buf, x, start, gain=1.0, pan=0.0):
     buf[1, i:i + len(x)] += x * gain * r * 1.4142
 
 
-def reverb(x, seconds=3.2, decay=1.1, tone=5000):
+def reverb(x, seconds=3.6, decay=1.3, tone=5000):
     n = int(seconds * SR)
     t = np.arange(n) / SR
     ir = np.zeros((2, n))
@@ -74,163 +82,167 @@ def reverb(x, seconds=3.2, decay=1.1, tone=5000):
     return np.stack([signal.fftconvolve(x[c], ir[c])[:N] for c in range(2)])
 
 
-dry = np.zeros((2, N))   # beat, bass
-wet = np.zeros((2, N))   # pads, plucks, bells, textures (sent to the reverb)
+dry = np.zeros((2, N))   # drums, bass
+wet = np.zeros((2, N))   # pads, arps, bells, fx (sent to the reverb)
 
-# --- Chords: one per bar (Dmaj9, Bm9, Gmaj7#11, Asus/A6) ------------------------
-D9, BM, G7, AS = [50, 57, 61, 64, 66, 69], [47, 54, 57, 61, 62, 66], [43, 50, 54, 57, 61, 64], [45, 52, 57, 59, 62, 66]
-ROOT = {id(D9): 38, id(BM): 35, id(G7): 31, id(AS): 33}
-BARS = [D9, D9, BM, G7, D9, AS, BM, G7, D9, AS, G7, D9]
+DM, BB, FF, CC, GM, AA = [50, 57, 62, 65, 69, 76], [46, 53, 58, 62, 65, 72], [41, 53, 57, 60, 65, 69], [48, 55, 60, 64, 67, 74], [43, 55, 58, 62, 67, 70], [45, 52, 57, 61, 64, 69]
+DMAJ = [50, 57, 62, 66, 69, 78]
+ROOT = {id(DM): 38, id(BB): 34, id(FF): 41, id(CC): 36, id(GM): 43, id(AA): 33, id(DMAJ): 38}
+DROP = [DM, BB, FF, CC] * 2 + [DM, BB, GM, AA]
+# (start, length, chord, brightness): the chord plan, scene by scene.
+PLAN = [(0, 5, DM, 700), (5, 4.24, BB, 900), (TOUCH, 3.76, FF, 1100), (13, 4, DM, 1300), (17, 4, CC, 1600)]
+PLAN += [(SC['mesure'] + 2 * i, 2, c, 2600 + 900 * (i >= 4)) for i, c in enumerate(DROP)]
+PLAN += [(45, 2, BB, 1500), (47, 2, FF, 1500), (49, 2, AA, 1900), (51, 2, DM, 3800), (53, 2, CC, 3800), (55, 5, DMAJ, 2600)]
 
-def soft_saw(freq, n):
-    t = np.arange(n) / SR
-    out = np.zeros(n)
-    for k in range(1, 9):
-        out += np.sin(2 * np.pi * k * freq * t) / (k ** 1.6)
-    return out * 0.5
-
-# Pads: warm, slowly breathing, brighter in the middle.
-for bi, chord in enumerate(BARS):
-    start = bi * BAR
-    length = BAR + 1.5 if bi < len(BARS) - 1 else DUR - start
-    n = int(length * SR)
+for k, (start, length, chord, brightness) in enumerate(PLAN):
+    tail = 1.2 if k < len(PLAN) - 1 else 0
+    n = int((length + tail) * SR)
     pad = np.zeros(n)
     for m in chord:
-        for det in (-0.07, 0.0, 0.08):
-            pad += soft_saw(mtof(m + det), n) * (0.5 if m < 50 else 0.38)
-    bright = 700 + 1500 * min(1, bi / 5) + (900 if 7 <= bi <= 9 else 0)
-    pad = lowpass(pad, bright, 2)
-    pad *= env_adsr(n, 1.2 if bi in (0, 2, 5, 8) else 0.5, 0.5, 0.85, 1.5)
-    pad *= 1 + 0.12 * np.sin(2 * np.pi * 0.2 * np.arange(n) / SR)
-    gain = 0.055 if bi < 2 else 0.065
-    if bi == 0: pad *= np.linspace(0.2, 1, n) ** 0.6
-    place(wet, pad, start, gain, pan=-0.2)
-    place(wet, np.roll(pad, 300), start, gain * 0.8, pan=0.25)
+        for det in (-0.09, 0.0, 0.11):
+            pad += saw(mtof(m + det), n, phase=rng.uniform(0, 6.28)) * (0.55 if m < 50 else 0.4)
+    pad = lowpass(pad, brightness, 2)
+    pad *= env_adsr(n, 1.2 if k in (0, 1, 3) else 0.2, 0.4, 0.85, 1.2 if tail else length * 0.7)
+    gain = 0.05 if start < 13 else 0.06
+    if k == 0: pad *= np.linspace(0.25, 1, n) ** 0.5
+    place(wet, pad, start, gain, pan=-0.15)
+    place(wet, np.roll(pad, 220), start, gain * 0.8, pan=0.25)
 
-# Wind: band-passed noise swells; water: soft lapping (low noise, slow modulation).
-def band(x, lo, hi):
-    b, a = signal.butter(2, [lo / (SR / 2), hi / (SR / 2)], "band")
-    return signal.lfilter(b, a, x)
-nw = N
-wind = band(rng.standard_normal(nw), 300, 1400)
-wmod = 0.35 + 0.65 * (0.5 + 0.5 * np.sin(2 * np.pi * t_all / 7.0 + 1.0)) ** 2
-wind *= wmod * np.clip(1 - np.abs(t_all - 6) / 9, 0.15, 1)
-place(wet, wind, 0, 0.009, -0.3)
-lap = lowpass(rng.standard_normal(nw), 420, 4) * (0.5 + 0.5 * np.sin(2 * np.pi * t_all * 0.6) ** 6)
-place(dry, lap, 0, 0.05, 0.2)
-# Sparkle: high shimmer at the start and the end (sun glints).
-for s0, s1 in ((0, 10), (24, 30)):
+# Sub drone under the lake and the flight; again under the landing.
+for s0, s1 in ((0, 13), (45, 51)):
     n = int((s1 - s0) * SR)
-    sh = highpass(rng.standard_normal(n), 7000) * (0.5 + 0.5 * np.sin(2 * np.pi * 0.5 * np.arange(n) / SR))
-    place(wet, sh * env_adsr(n, 2.0, 0.5, 0.8, 2.0), s0, 0.0015)
+    drone = np.sin(2 * np.pi * mtof(26) * np.arange(n) / SR) * env_adsr(n, 1.2, 0.5, 0.9, 1.5)
+    place(dry, drone, s0, 0.15)
 
-# --- Kalimba-like arpeggio (8ths, 16ths from 15 s) ------------------------------
-def pluck(m, length=0.9):
-    n = int(length * SR)
-    t = np.arange(n) / SR
-    f = mtof(m)
-    x = np.sin(2 * np.pi * f * t) * np.exp(-t / 0.35) + 0.35 * np.sin(2 * np.pi * f * 3.0 * t) * np.exp(-t / 0.06)
-    x += 0.12 * np.sin(2 * np.pi * f * 5.4 * t) * np.exp(-t / 0.03)
-    return x * (1 - np.exp(-t / 0.002))
-pattern = [0, 2, 4, 1, 3, 5, 2, 4]
-for bi in range(2, 12):
-    chord = BARS[bi]
-    tones = [m + 12 for m in chord[1:]]
-    sub = 4 if 6 <= bi <= 9 else 2
-    steps = 4 * sub
-    for k in range(steps):
-        if bi == 11 and k > steps // 2: break
-        tt = bi * BAR + k * BEAT / sub
+# High shimmer: filtered noise breathing over the lake and the end card.
+for s0, s1 in ((0, 11), (55, 60)):
+    n = int((s1 - s0) * SR)
+    sh = highpass(rng.standard_normal(n), 6000) * (0.5 + 0.5 * np.sin(2 * np.pi * 0.4 * np.arange(n) / SR))
+    place(wet, sh * env_adsr(n, 1.5, 0.5, 0.8, 1.5), s0, 0.008)
+
+# --- Arpeggio (16ths): enters with the charge, opens through the build, full in the drop ------
+pattern = [0, 2, 1, 3, 2, 4, 3, 1]
+step = BEAT / 4
+for start, length, chord, _ in PLAN:
+    if start < 13 or start >= 55: continue
+    tones = [m + 12 for m in chord[2:]]
+    for k in range(int(round(length / step))):
+        tt = start + k * step
         m = tones[pattern[k % 8] % len(tones)]
-        g = 0.07 if sub == 2 else 0.055
-        if bi == 2: g *= 0.4 + 0.6 * k / steps
-        pan = 0.4 if k % 2 else -0.4
-        place(wet, pluck(m), tt, g, pan)
-        place(wet, pluck(m) * 0.35, tt + 3 * BEAT / sub, g, -pan)
+        n = int(0.35 * SR)
+        x = saw(mtof(m), n) * 0.5 + np.sin(2 * np.pi * mtof(m) * np.arange(n) / SR) * 0.6
+        if tt < SC['mesure']: open_, g = 1500 + 2500 * (tt - 13) / 8, 0.04 + 0.015 * (tt - 13) / 8
+        elif tt < SC['pose']: open_, g = 5200 + (1500 if tt >= SC['prevision'] else 0), 0.062
+        elif tt < SC['repart']: open_, g = 2200, 0.045
+        else: open_, g = 7500, 0.07
+        x = lowpass(x, open_) * np.exp(-np.arange(n) / SR / 0.11)
+        pan = 0.35 if k % 2 else -0.35
+        place(wet, x, tt, g, pan)
+        place(wet, x * 0.45, tt + 3 * step, g, -pan)  # ping-pong echo
 
-# --- Soft beat 12.5-25 s ---------------------------------------------------------
+# --- Drums: half-time pulse from the wind, full beat in the drop and the take-off ------------
 def kick():
-    n = int(0.4 * SR)
+    n = int(0.45 * SR)
     t = np.arange(n) / SR
-    f = 48 + 60 * np.exp(-t / 0.05)
-    return np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t / 0.16)
-def shaker(length=0.07):
+    f = 45 + 85 * np.exp(-t / 0.045)
+    ph = 2 * np.pi * np.cumsum(f) / SR
+    return np.sin(ph) * np.exp(-t / 0.18) + 0.15 * highpass(rng.standard_normal(n), 3000) * np.exp(-t / 0.004)
+
+def hat(length=0.05):
     n = int(length * SR)
-    return band(rng.standard_normal(n), 5000, 11000) * np.sin(np.pi * np.arange(n) / n) ** 2
-def rim():
-    n = int(0.12 * SR)
-    t = np.arange(n) / SR
-    return (np.sin(2 * np.pi * 1700 * t) * 0.6 + band(rng.standard_normal(n), 1500, 4000)) * np.exp(-t / 0.018)
+    return highpass(rng.standard_normal(n), 7500) * np.exp(-np.arange(n) / SR / (length / 4))
+
 K = kick()
-for b in range(int(12.5 / BEAT), int(25 / BEAT)):
+for b in range(int(SC['vent'] / BEAT), int(SC['fin'] / BEAT)):
     tt = b * BEAT
-    full = tt >= 15
-    if b % 2 == 0 or full: place(dry, K, tt, 0.32 if full else 0.2)
-    place(dry, shaker(), tt + BEAT / 2, 0.05 if full else 0.03, 0.3)
-    if full: place(dry, shaker(0.04), tt + BEAT / 4, 0.02, -0.3); place(dry, shaker(0.04), tt + 3 * BEAT / 4, 0.02, -0.3)
-    if full and b % 4 == 2: place(dry, rim(), tt, 0.06, -0.15)
+    if tt < SC['mesure']:
+        if b % 4 == 0: place(dry, K, tt, 0.2)
+    elif tt < SC['zone'] or tt >= SC['repart']:
+        place(dry, K, tt, 0.48 if tt >= SC['repart'] else 0.42)
+        place(dry, hat(), tt + BEAT / 2, 0.06, 0.3)
+        if b % 4 == 3: place(dry, hat(0.12), tt + BEAT * 0.75, 0.035, -0.3)
+    elif tt < SC['pose']:                       # the program scans: lighter, ticking hats
+        if b % 2 == 0: place(dry, K, tt, 0.3)
+        place(dry, hat(0.03), tt + BEAT / 4, 0.03, -0.4)
+        place(dry, hat(), tt + BEAT / 2, 0.05, 0.3)
+        place(dry, hat(0.03), tt + 3 * BEAT / 4, 0.03, 0.4)
 
-# Round bass under the beat.
-for bi in range(5, 10):
-    root = ROOT[id(BARS[bi])]
-    for k, (off, ln) in enumerate(((0, 1.5), (1.5, 0.5), (2, 1.5), (3.5, 0.5))):
-        n = int(ln * BEAT * SR)
-        f = mtof(root + (12 if k == 3 else 0))
-        x = np.sin(2 * np.pi * f * np.arange(n) / SR) + 0.2 * np.sin(4 * np.pi * f * np.arange(n) / SR)
-        x *= env_adsr(n, 0.01, 0.15, 0.6, 0.06)
-        place(dry, x, bi * BAR + off * BEAT, 0.15)
+# Build ticks into the drop and into the take-off (accelerating 8ths -> 16ths -> 32nds).
+for s0, s1 in ((SC['mesure'] - 2.5, SC['mesure']), (SC['repart'] - 2.0, SC['repart'])):
+    tt = s0
+    while tt < s1:
+        left = s1 - tt
+        rate = BEAT / 2 if left > 1.2 else BEAT / 4 if left > 0.5 else BEAT / 8
+        place(wet, hat(0.06), tt, 0.03 + 0.05 * (1 - left / (s1 - s0)), rng.uniform(-0.5, 0.5))
+        tt += rate
 
-# --- Bell melody over the drift map (17.5-25 s) ---------------------------------
-def bell(m, length=2.6):
+# Sub bass following the roots in the drop and the take-off.
+for start, length, chord, _ in PLAN:
+    if not (SC['mesure'] <= start < SC['fin']) or SC['pose'] <= start < SC['repart']: continue
+    root = ROOT[id(chord)]
+    for k in range(int(length / (BEAT / 2))):
+        n = int(BEAT / 2 * SR)
+        f = mtof(root)
+        x = np.sin(2 * np.pi * f * np.arange(n) / SR) + 0.3 * np.sin(4 * np.pi * f * np.arange(n) / SR)
+        x *= env_adsr(n, 0.01, 0.1, 0.7, 0.05)
+        place(dry, x, start + k * BEAT / 2, 0.15)
+for start, length, chord, _ in PLAN:                # long notes under the landing
+    if SC['pose'] <= start < SC['repart']:
+        n = int(length * SR)
+        x = np.sin(2 * np.pi * mtof(ROOT[id(chord)]) * np.arange(n) / SR) * env_adsr(n, 0.3, 0.3, 0.8, 0.6)
+        place(dry, x, start, 0.12)
+
+# --- FX: risers, impacts, bells -----------------------------------------------------------
+def riser(length):
     n = int(length * SR)
     t = np.arange(n) / SR
-    f = mtof(m)
-    return sum(a * np.sin(2 * np.pi * f * r * t) * np.exp(-t / d) for r, a, d in ((1, 1, 1.5), (2.0, 0.25, 0.9), (2.76, 0.3, 0.5), (5.4, 0.12, 0.25)))
-melody = [(17.5, 78), (18.75, 81), (19.375, 78), (20.0, 76), (21.25, 74), (22.5, 78), (23.125, 81), (23.75, 83), (24.375, 85)]
-for tt, m in melody:
-    place(wet, bell(m), tt, 0.06, 0.15 * np.sin(tt))
-
-# --- FX --------------------------------------------------------------------------
-def swell(length):
-    n = int(length * SR)
-    t = np.arange(n) / SR
-    x = np.zeros(n)
-    noise = rng.standard_normal(n)
+    x = rng.standard_normal(n)
+    out = np.zeros(n)
     seg = 2048
     for i in range(0, n, seg):
-        fc = 400 + 5000 * (i / n) ** 2
-        b, a = signal.butter(2, [fc / (SR / 2), min(0.95, fc * 1.5 / (SR / 2))], "band")
-        x[i:i + seg] = signal.lfilter(b, a, noise[i:i + seg])
-    return x * (t / length) ** 2.2
-def splash():
-    n = int(1.8 * SR)
+        fc = 300 + 7000 * (i / n) ** 2
+        b, a = signal.butter(2, [fc / (SR / 2), min(0.95, fc * 1.6 / (SR / 2))], "band")
+        out[i:i + seg] = signal.lfilter(b, a, x[i:i + seg])
+    tone = np.sin(2 * np.pi * np.cumsum(200 + 900 * (t / length) ** 2) / SR) * 0.25
+    return (out + tone) * (t / length) ** 2
+
+def impact():
+    n = int(2.6 * SR)
     t = np.arange(n) / SR
-    burst = band(rng.standard_normal(n), 400, 6000) * np.exp(-t / 0.18)
-    bloop = np.sin(2 * np.pi * np.cumsum(220 + 500 * np.exp(-t / 0.05)) / SR) * np.exp(-t / 0.12) * 0.5
-    drops = sum(np.sin(2 * np.pi * (900 + 400 * k) * np.clip(t - 0.15 * k, 0, None)) * np.exp(-np.clip(t - 0.15 * k, 0, None) / 0.03) * (t > 0.15 * k) * 0.15 for k in range(1, 5))
-    return burst + bloop + drops
-def tick():
-    n = int(0.03 * SR)
-    return band(rng.standard_normal(n), 2000, 7000) * np.exp(-np.arange(n) / SR / 0.004)
+    boom = np.sin(2 * np.pi * np.cumsum(38 + 60 * np.exp(-t / 0.08)) / SR) * np.exp(-t / 0.9)
+    crash = lowpass(rng.standard_normal(n), 4000) * np.exp(-t / 0.5) * 0.25
+    return boom + crash
 
-place(wet, swell(1.8), 7.1, 0.06)          # the approach
-place(dry, splash(), 9.0, 0.22)            # touchdown
-place(wet, swell(2.5), 15.0, 0.05)         # into the drift map
-place(wet, bell(74, 4.0), 17.5, 0.05, -0.2)
-place(dry, splash() * 0.5, 23.0, 0.14)     # landing at the chosen point
-tt = 25.0
-while tt < 27.3:                           # servo + worm screw of the anchor
-    place(dry, tick(), tt, 0.05, 0.3)
-    tt += 0.085
-for i, m in enumerate((74, 78, 81, 86)):   # end card
-    place(wet, bell(m, 3.5), 27.5 + i * BEAT / 3, 0.06 - i * 0.008, (-0.3, 0.3)[i % 2])
+def bell(m, length=3.0):
+    n = int(length * SR)
+    t = np.arange(n) / SR
+    f = mtof(m)
+    return sum(a * np.sin(2 * np.pi * f * r * t) * np.exp(-t / d) for r, a, d in ((1, 1, 1.4), (2.76, 0.4, 0.6), (5.4, 0.2, 0.3), (8.93, 0.1, 0.15)))
 
-# --- Mix -----------------------------------------------------------------------
-mix = dry + wet * 0.7 + reverb(wet, seconds=3.8, decay=1.4, tone=4500) * 0.6
-mix = highpass(mix, 30)
-mix = mix / np.abs(mix).max()
-mix = np.tanh(mix * 2.2) / np.tanh(2.2)
-fade_in, fade_out = int(0.4 * SR), int(1.2 * SR)
+place(wet, bell(74), 0.6, 0.07)                    # title
+place(wet, bell(81), 0.6 + BEAT, 0.05, 0.3)
+place(wet, riser(2.2), TOUCH - 2.2, 0.06)          # the flare
+place(dry, impact(), TOUCH, 0.18)                  # touchdown, felt rather than heard
+place(wet, bell(77), TOUCH, 0.05, -0.2)
+place(wet, riser(2.5), SC['mesure'] - 2.5, 0.11)   # build into the drop
+place(dry, impact(), SC['mesure'], 0.45)
+place(wet, bell(81), FIVE, 0.07, 0.2)              # 5 %
+place(wet, bell(86), FIVE + BEAT, 0.05, -0.2)
+place(wet, bell(77), VEC[0], 0.045, -0.3)          # the drift vectors land
+place(wet, bell(81), VEC[1], 0.045, 0.3)
+place(wet, bell(86), PICK, 0.06, 0.2)              # the zone is picked
+place(wet, bell(74), LAND, 0.05)                   # the computed landing
+place(wet, riser(2.0), SC['repart'] - 2.0, 0.12)   # build into the take-off
+place(dry, impact(), SC['repart'], 0.5)
+place(dry, impact(), SC['fin'], 0.3)               # end card
+for i, m in enumerate((74, 78, 81, 86)):
+    place(wet, bell(m), SC['fin'] + 0.3 + i * BEAT / 2, 0.075 - 0.01 * i, (-0.3, 0.3)[i % 2])
+
+# --- Mix -------------------------------------------------------------------------------------
+mix = dry + wet * 0.75 + reverb(wet) * 0.55
+mix = highpass(mix, 28)
+mix = np.tanh(mix * 1.6) / np.tanh(1.6)
+fade_in, fade_out = int(0.25 * SR), int(1.6 * SR)
 mix[:, :fade_in] *= np.linspace(0, 1, fade_in)
 mix[:, -fade_out:] *= np.linspace(1, 0, fade_out) ** 1.5
 mix *= 0.89 / np.abs(mix).max()

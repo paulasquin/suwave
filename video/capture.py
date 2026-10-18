@@ -23,24 +23,22 @@ app = modal.App("suwave-video-capture", image=image)
 
 FPS = 30
 W, H = 1080, 1920
-# One shot per bar of the music (96 BPM: 2.5 s). Fields: start s, end s, act name,
+# Shots on the bars of the music (96 BPM: 2.5 s). Fields: start s, end s, act name,
 # progress from, progress to, easing, options:
 #   zoom         camera zoom on top of the site's portrait framing (tighter for video)
 #   shift        horizontal view shift (fraction of the width) to recentre a subject,
 #                fading out as the progress reaches shift_until
 #   restart      restart the act's wall-clock intro at the start of the shot (act.t0),
 #                restartAt ms into it
+#   js           code run on every frame after setProgress, with the act as `a`
 SHOTS = [
-    (0.0, 5.0, "lake", 0.00, 0.16, "linear", {"restart": True, "restartAt": 1200}),
-    (5.0, 10.0, "lake", 0.22, 0.47, "linear", {}),               # touchdown at 9.0 s
-    (10.0, 12.5, "lake", 0.50, 0.60, "linear", {"zoom": 1.1}),
-    (12.5, 15.0, "wing", 0.05, 0.24, "linear", {"zoom": 1.15}),
-    (15.0, 17.5, "wing", 0.78, 0.99, "linear", {"zoom": 0.85}),   # motor up on its pivot, vertical take-off
-    (17.5, 20.0, "drift", 0.03, 0.19, "linear", {}),
-    (20.0, 22.5, "drift", 0.46, 0.58, "linear", {}),
-    (22.5, 25.0, "drift", 0.60, 0.78, "linear", {}),            # landing at the chosen point ~23.0 s
-    (25.0, 27.5, "anchor", 0.72, 0.95, "inout", {"zoom": 1.1}),
-    (27.5, 30.0, "lake", 0.02, 0.08, "linear", {"restart": True, "restartAt": 6000}),
+    (0.0, 7.5, "lake", 0.13, 0.47, "linear", {"restart": True, "restartAt": 1200}),   # fly-by 2.9 s, touchdown 6.37 s
+    (7.5, 12.5, "lake", 0.48, 0.68, "linear", {"zoom": 1.1}),     # floating, turning into the wind, drifting
+    (12.5, 20.0, "drift", 0.01, 0.195, "linear", {}),            # the real tracks of 16 August 2017
+    (20.0, 25.0, "drift", 0.20, 0.40, "linear", {}),             # forecast field, drift vectors (11:00 at 22.5 s), zone U
+    (25.0, 30.0, "drift", 0.40, 0.60, "linear", {}),             # the program scans the zones, picks zone D (28.75 s)
+    (30.0, 35.0, "drift", 0.60, 0.795, "linear", {"js": "a.drone.scale.setScalar(110)"}),   # landing at the computed point (30.9 s), three hours of drift
+    (35.0, 40.0, "lake", 0.02, 0.10, "linear", {"restart": True, "restartAt": 6000}),
 ]
 
 CLOCK = """(() => {
@@ -61,6 +59,7 @@ STEP = """([act, p, first, o]) => {
   if (o.shift) a.camera.setViewOffset(innerWidth, innerHeight, o.shift * innerWidth * (1 - Math.min(1, p / (o.shift_until || 1))), 0, innerWidth, innerHeight);
   a.camera.updateProjectionMatrix();
   a.setProgress(p);
+  if (o.js) new Function("a", o.js)(a);
   window.__advance(1000 / 30);
 }"""
 

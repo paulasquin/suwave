@@ -1,4 +1,4 @@
-"""Write the on-screen text (ASS) of the 30 s vertical video, in French and English.
+"""Write the on-screen text (ASS) of the 40 s vertical video, in French and English.
 
     python3 captions.py   # -> captions_fr.ass, captions_en.ass
 """
@@ -55,7 +55,7 @@ def block(start, end, big=None, kicker=None, sub=None, number=None, dy=0):
     if big:
         out += line(start + 0.06, end, "Big", big.replace("\n", r"\N"), y)
     if sub:
-        out += line(start + 0.18, end, "Sub", sub, y + (120 if big and "\n" in big else 90) if big else y, rise=24)
+        out += line(start + 0.18, end, "Sub", sub.replace("\n", r"\N"), y + (120 if big and "\n" in big else 90) + (22 if "\n" in sub else 0) if big else y, rise=24)
     return out
 
 
@@ -68,33 +68,34 @@ def ending(start, end, title, sub, url):
     return out
 
 
-# One entry per shot: (start, end, dict(kicker=, big=, sub=, number=, dy=)), then the end card
-# ("end", title, subtitle, url). Keep big lines under ~17 characters (Unbounded is wide).
-# ACCENT colours what follows; WHITE switches back.
+# One entry per text block: (start, end, dict(kicker=, big=, sub=, number=, dy=)), then the end card
+# ("end", title, subtitle, url). Keep big lines under ~17 characters (Unbounded is wide); "\n"
+# breaks a line (sub included). ACCENT colours what follows; WHITE switches back.
+END = 35.4
 TEXT = {
     "fr": [
-        (0.4, 4.8, dict(kicker="QUÉBEC · ÉTÉ 2017", big="Un drone solaire\nqui se pose\nsur les lacs", dy=40)),
-        (5.2, 9.6, dict(big="Il se pose\npour recharger")),
-        (10.0, 12.3, dict(big=f"{ACCENT}3 h{WHITE} au soleil…\net le vent\nl'emporte")),
-        (12.6, 14.8, dict(kicker="L'AILE", big="Taillée\nau fil chaud")),
-        (15.1, 17.3, dict(big="Le moteur pivote,\nelle repart\nà la verticale")),
-        (17.6, 19.8, dict(kicker="16 AOÛT 2017", big=f"Elle dérive à\n{ACCENT}5 %{WHITE} du vent")),
-        (20.1, 22.3, dict(kicker="MON PROGRAMME", big="Trouver la place\nsur le lac")),
-        (22.6, 24.8, dict(big="Se poser au vent,\ndériver à l'abri")),
-        (25.1, 27.3, dict(kicker="L'ANCRE", number="30 s", sub="pour la déployer", dy=80)),
-        ("end", f"prévoir\n{ACCENT}la dérive", "Tout le projet en 3D", "suwave.paulasquin.com"),
+        (0.4, 5.9, dict(kicker="QUÉBEC · ÉTÉ 2017", big="Une aile solaire\nqui se pose\nsur les lacs", dy=40)),
+        (7.6, 9.9, dict(big="Trois heures\nau soleil\npour recharger")),
+        (10.1, 12.3, dict(big="Mais le vent\nla pousse\nvers la berge")),
+        (12.6, 16.0, dict(kicker="MESURER · 16 AOÛT 2017", big="Trois ailes\nlivrées au vent", sub="suivies au GPS, seconde par seconde")),
+        (16.3, 19.8, dict(kicker="VITESSE DE DÉRIVE", number="5 %", sub="de la vitesse du vent", dy=80)),
+        (20.1, 22.3, dict(kicker="PRÉDIRE", big="Les prévisions\nde vent", sub="un vecteur toutes les trois heures")),
+        (22.6, 24.8, dict(big=f"{ACCENT}5 %{WHITE} × vent × durée", sub="mis bout à bout,\nles vecteurs tracent la dérive")),
+        (25.1, 29.8, dict(kicker="290 ZONES D'EAU LIBRE", big="Choisir celle\nqui contient\nla dérive")),
+        (30.1, 34.8, dict(kicker="LE POINT DE POSE", big="Se poser au vent", sub="et dériver trois heures\nsans atteindre la berge")),
+        ("end", f"prévoir\n{ACCENT}la dérive", "Tout le projet, en 3D", "suwave.paulasquin.com"),
     ],
     "en": [
-        (0.4, 4.8, dict(kicker="QUÉBEC · SUMMER 2017", big="A solar drone\nthat lands\non lakes", dy=40)),
-        (5.2, 9.6, dict(big="It lands\nto recharge")),
-        (10.0, 12.3, dict(big=f"{ACCENT}3 h{WHITE} in the sun…\nwhile the wind\npushes it away")),
-        (12.6, 14.8, dict(kicker="THE WING", big="Cut with\na hot wire")),
-        (15.1, 17.3, dict(big="The motor tilts,\nit lifts off\nvertically")),
-        (17.6, 19.8, dict(kicker="16 AUGUST 2017", big=f"It drifts at\n{ACCENT}5%{WHITE} of the wind")),
-        (20.1, 22.3, dict(kicker="MY PROGRAM", big="Finding room\non the lake")),
-        (22.6, 24.8, dict(big="Land upwind,\ndrift in safety")),
-        (25.1, 27.3, dict(kicker="THE ANCHOR", number="30 s", sub="to deploy it", dy=80)),
-        ("end", f"predict\n{ACCENT}the drift", "The whole project in 3D", "suwave.paulasquin.com"),
+        (0.4, 5.9, dict(kicker="QUÉBEC · SUMMER 2017", big="A solar wing\nthat lands\non lakes", dy=40)),
+        (7.6, 9.9, dict(big="Three hours\nin the sun\nto recharge")),
+        (10.1, 12.3, dict(big="But the wind\npushes it\ntowards the shore")),
+        (12.6, 16.0, dict(kicker="MEASURE · 16 AUGUST 2017", big="Three wings\nset adrift", sub="tracked by GPS, second by second")),
+        (16.3, 19.8, dict(kicker="DRIFT SPEED", number="5%", sub="of the wind speed", dy=80)),
+        (20.1, 22.3, dict(kicker="PREDICT", big="The wind\nforecast", sub="one vector every three hours")),
+        (22.6, 24.8, dict(big=f"{ACCENT}5%{WHITE} × wind × time", sub="placed head to tail,\nthe vectors trace the drift")),
+        (25.1, 29.8, dict(kicker="290 PATCHES OF OPEN WATER", big="Pick the one\nthat holds\nthe drift")),
+        (30.1, 34.8, dict(kicker="THE LANDING POINT", big="Land upwind", sub="and drift for three hours\nwithout reaching the shore")),
+        ("end", f"predict\n{ACCENT}the drift", "The whole project, in 3D", "suwave.paulasquin.com"),
     ],
 }
 
@@ -102,7 +103,7 @@ for lang, items in TEXT.items():
     events = []
     for it in items:
         if it[0] == "end":
-            events += ending(27.6, 30.0, it[1], it[2], it[3])
+            events += ending(END, 40.0, it[1], it[2], it[3])
         else:
             events += block(it[0], it[1], **it[2])
     open(f"captions_{lang}.ass", "w").write(HEAD + "\n".join(events) + "\n")
