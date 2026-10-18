@@ -81,11 +81,13 @@ def render(url: str, only: str = "") -> bytes:
             pg.on("pageerror", lambda e: print("PAGEERROR", e))
             await pg.add_init_script(CLOCK)
             await pg.goto(url, wait_until="load")
-            for _ in range(2000):  # let the loader finish on the virtual clock
+            for _ in range(8000):  # let the loader finish on the virtual clock
                 await pg.evaluate("window.__advance && window.__advance(16)")
                 if await pg.evaluate("!!window.__kit && document.getElementById('loader').classList.contains('done')"):
                     break
                 await pg.wait_for_timeout(20)
+            if not await pg.evaluate("!!window.__kit"):
+                raise RuntimeError("the page did not finish loading (no window.__kit): " + await pg.evaluate("document.getElementById('loader-num')?.textContent || ''"))
             await pg.wait_for_timeout(1500)
             n = 0
             for si, (t0, t1, act, p0, p1, k, opts) in enumerate(SHOTS):

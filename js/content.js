@@ -7,11 +7,11 @@ import { TIMELINE_EN, ENTRIES_EN, STATS_EN, BARS_EN, TILES_EN, TEAM_EN, SOURCES_
 const ph = (name, caption, contain) => ({ src: `assets/photos/${name}.webp`, caption, contain });
 
 export const TIMELINE = [
-  { date: '5 juil.', title: 'Arrivée au 3IT', text: 'Première journée, premier vol de l\'aile solaire, et un conseil : mesurer la dérive avant de la prédire.' },
+  { date: '5 juil.', title: 'Arrivée au 3IT', text: 'Première journée, un vol d\'essai de l\'aile solaire, et un conseil : mesurer la dérive avant de la prédire.' },
   { date: '6 juil.', title: 'Trois ailes de dérive', text: 'Découpées au fil chaud dans la mousse isolante, sans moteur ni hélice.' },
   { date: '11–13 juil.', title: 'Le programme d\'anticipation', text: 'Prévisions de vent en base SQLite, premier point de pose calculé.' },
   { date: '26 juil.', title: 'Essai n°1', text: 'Lac des Nations, Sherbrooke : algues, kayakiste curieux et vent contraire aux prévisions.' },
-  { date: '2 août', title: 'Essai n°2', text: 'Lac à la Truite, Orford : trois ailes en parallèle, et la portée des antennes.' },
+  { date: '2 août', title: 'Essai n°2', text: 'Lac à la Truite, Orford : trois ailes en parallèle. Le même jour, près du 3IT, un test de portée des antennes.' },
   { date: '16 août', title: 'Essai n°3', text: 'Lac Montjoie : grand vent, dérives très propres, le coefficient de 5 % se confirme.' },
   { date: '22 août', title: 'Bilan d\'avancement', text: 'Algorithme fonctionnel, prototypes d\'ancres, système de déploiement à croisillons.' },
   { date: '29 août', title: 'Essai n°4', text: 'Lac Montjoie : les prototypes anti-dérive à l\'eau, par un vent trop faible pour conclure.' },
@@ -20,11 +20,11 @@ export const TIMELINE = [
 export const ENTRIES = [
   {
     id: 'arrivee', num: '01', date: '5 juillet 2017', year: '3IT',
-    title: 'Premier jour, premier vol',
+    title: 'Premier jour, et déjà un vol',
     question: 'Combien de soleil faut-il à une aile pour repartir ?',
     body: [
       'La dernière version de l\'aile vole le jour de mon arrivée, équipée de panneaux solaires fonctionnels : en plein soleil, elle se recharge en 3 heures. Au Québec, le soleil dure 9 heures en hiver et 15 en été, souvent derrière les nuages ; par temps couvert, l\'aile limite tout juste sa décharge. En veille, elle consomme environ 1 mW.',
-      'À la réunion mensuelle du 3IT, je présente mes premières lignes de code sur l\'optimisation du point de pose. Alexis Lussier-Desbiens me conseille de commencer plus large : obtenir d\'abord des valeurs chiffrées sur la dérive, en fonction du vent et du courant.',
+      'À la réunion mensuelle du 3IT, je présente mes premières lignes de code sur l\'optimisation du point de pose. Alexis Lussier-Desbiens me conseille d\'élargir d\'abord l\'approche : obtenir des valeurs chiffrées sur la dérive, en fonction du vent et du courant.',
     ],
     result: 'Un plan de travail : instrumenter des ailes, mesurer leur dérive, puis l\'anticiper.',
     media: [ph('vol-solaire', 'Richard-Alexandre Péloquin tient l\'aile solaire avant un vol d\'essai')],
@@ -35,10 +35,10 @@ export const ENTRIES = [
     question: 'Comment fabriquer vite des ailes à laisser dériver ?',
     body: [
       'Les ailes sont découpées dans des panneaux de mousse isolante. Des profils en bois, posés sur la tranche, guident un fil métallique parcouru par un courant (20 V, 4 A) qui tranche la mousse instantanément et avec une précision surprenante. Des graduations permettent de vérifier que l\'archet avance régulièrement.',
-      'Chaque demi-aile est ensuite collée à son miroir à l\'époxy. Ces maquettes n\'ont ni moteur, ni hélice, ni actionneur : elles servent à étudier une dérive inerte à la surface de l\'eau.',
+      'Chaque demi-aile est ensuite collée à l\'époxy à son symétrique. Ces maquettes n\'ont ni moteur, ni hélice, ni actionneur : elles servent à étudier une dérive inerte à la surface de l\'eau.',
     ],
-    result: 'De quoi équiper trois ailes de dérive, numérotées 2, 3 et 4.',
-    media: [ph('mousse-panneau', 'Le panneau de mousse isolante'), ph('mousse-profils', 'Les profils de l\'aile posés sur la tranche'), ph('mousse-decoupe', 'Le fil chaud suit les profils en bois'), ph('demi-aile', 'Une demi-aile, avant collage avec son miroir')],
+    result: 'De quoi fabriquer trois ailes de dérive, qui porteront les numéros 2, 3 et 4.',
+    media: [ph('mousse-panneau', 'Le panneau de mousse isolante'), ph('mousse-profils', 'Les profils de l\'aile posés sur la tranche'), ph('mousse-decoupe', 'Le fil chaud suit les profils en bois'), ph('demi-aile', 'Une demi-aile, avant collage avec son symétrique')],
   },
   {
     id: 'pixhawk', num: '03', date: '7 – 26 juillet 2017', year: 'PX4',
@@ -46,18 +46,18 @@ export const ENTRIES = [
     question: 'Comment ne perdre aucune donnée d\'un essai de douze heures ?',
     body: [
       'Par défaut, le PixHawk n\'enregistre qu\'une fois armé, à 200 Hz. J\'ai réglé l\'enregistrement à 1 Hz, de la mise sous tension à l\'extinction, sur quatre messages seulement : position GPS, capteurs internes, tube de Pitot et état de la batterie. À 0,05 Mo par minute, un essai de 12 heures n\'écrirait que 36 Mo sur la carte SD de 4 Go.',
-      'Restait un défaut : débrancher la batterie corrompait le fichier en cours. J\'ai écrit « plogger », une application embarquée dans PX4 qui, toutes les 15 minutes, ferme proprement le fichier puis redémarre le contrôleur pour en ouvrir un nouveau. Au pire, on ne perd que le dernier quart d\'heure. Pour repérer la mise à l\'eau dans les données, on secoue l\'aile quinze secondes avant et après : les pics d\'accélération verticale balisent l\'essai.',
+      'Restait un défaut : débrancher la batterie corrompait le fichier en cours. J\'ai écrit « plogger », une application embarquée dans PX4 qui, toutes les 15 minutes, ferme proprement le fichier puis redémarre le contrôleur pour en ouvrir un nouveau. Au pire, on ne perd que le dernier quart d\'heure. Pour repérer la mise à l\'eau dans les données, nous secouons l\'aile pendant quinze secondes juste avant et juste après : les pics d\'accélération verticale balisent l\'essai.',
     ],
-    result: 'Des journaux fiables, publiés sur GitHub avec mes autres modifications du firmware PX4.',
-    media: [ph('electronique', 'L\'électronique d\'une aile de dérive : interrupteur, alimentation, contrôleur, batterie, GPS, télémétrie', true), ph('accel-z', 'Accélération verticale lors de l\'essai du 26 juillet : les secousses marquent la mise à l\'eau et la sortie', true)],
+    result: 'Des journaux fiables ; le code de plogger est publié sur GitHub avec mes autres modifications du firmware PX4.',
+    media: [ph('electronique', 'L\'électronique intégrée dans une aile : interrupteur d\'armement, alimentation, contrôleur de vol, batterie, GPS, télémétrie', true), ph('accel-z', 'Accélération verticale lors de l\'essai du 26 juillet : les secousses marquent la mise à l\'eau et la sortie', true)],
   },
   {
     id: 'programme', num: '04', date: '11 – 13 juillet 2017', year: 'Python',
     title: 'Un premier point de pose',
     question: 'Peut-on calculer à l\'avance où poser l\'aile ?',
     body: [
-      'Un script Python récupère les prévisions de vent de trois stations Windfinder et les enregistre dans une base SQLite, en remplaçant les plus anciennes. Une interface Tkinter permet de choisir le lac, la date de début et la durée de la dérive ; le programme trace la dérive prévue, la zone minimale qu\'elle occupe et la zone de sécurité disponible, puis donne les coordonnées GPS du point de pose.',
-      'Au fil du stage, le calcul s\'affine : pondération à la seconde du temps passé sous chaque vecteur de vent, intégration du maillage GEGI, construction automatique des zones de sécurité de chaque lac.',
+      'Un script Python récupère les prévisions de vent Windfinder pour trois sites et les enregistre dans une base SQLite, en remplaçant les plus anciennes. Dès le 13 juillet, le programme affiche un premier point de pose optimal, encore en coordonnées cartésiennes.',
+      'Au fil du stage, le calcul s\'affine : conversion en coordonnées GPS, pondération à la seconde du temps passé sous chaque vecteur de vent, intégration du maillage GEGI, construction automatique des zones de sécurité de chaque lac. Une interface Tkinter permet de choisir le lac, la date de début et la durée de la dérive ; le programme trace la dérive prévue, la zone minimale qu\'elle occupe et la zone de sécurité disponible, puis donne les coordonnées GPS du point de pose.',
     ],
     result: 'Un programme qui donne, pour un lac et une recharge, la position GPS du point de pose.',
     media: [ph('interface', 'L\'interface de simulation de dérive', true), ph('console', 'Le retour console des calculs', true), ph('anticipation-sortie', 'Le résultat : zone de sécurité (bleu), déplacement (rouge), zone minimale de dérive (noir)', true)],
@@ -68,7 +68,7 @@ export const ENTRIES = [
     question: 'Que dit une première dérive grandeur nature ?',
     body: [
       'Richard-Alexandre et moi posons une aile instrumentée au centre du lac des Nations, à Sherbrooke, pour environ une heure et demie. Les berges sont en partie fermées après la fête du lac ; nous perdons parfois l\'aile de vue. Elle finit freinée dans un banc d\'algues, et à la 67e minute ses capteurs enregistrent une forte secousse inexpliquée.',
-      'L\'énigme sera résolue quelques jours plus tard : un kayakiste, intrigué, a contacté l\'université pour signaler qu\'il avait manipulé l\'aile avant de la reposer à l\'eau. Autre surprise : le vent soufflait exactement à l\'opposé des prévisions de la station de l\'aéroport. Faute de données de vent fiables, l\'essai ne permet qu\'une première estimation du rapport entre dérive et vent.',
+      'L\'énigme sera résolue plus tard : un kayakiste, intrigué, a contacté l\'université pour signaler qu\'il avait manipulé l\'aile avant de la reposer à l\'eau. Autre surprise : le vent soufflait exactement à l\'opposé des prévisions de la station de l\'aéroport. Faute de données de vent fiables, l\'essai ne permet qu\'une première estimation du rapport entre dérive et vent.',
     ],
     result: 'Le vent semble le seul moteur de la dérive ; il faudra des mesures de vent plus fiables.',
     media: [ph('canot', 'Richard-Alexandre en route pour poser l\'aile au centre du lac'), ph('aile-capteurs', 'L\'aile équipée de ses capteurs'), ph('canards', 'Nos compagnons d\'expérience')],
@@ -89,8 +89,8 @@ export const ENTRIES = [
     title: 'Lac à la Truite : trois ailes à la fois',
     question: 'La dérive est-elle proportionnelle au vent ?',
     body: [
-      'Avec Alexis Lussier-Desbiens et Richard-Alexandre Péloquin, nous lâchons trois ailes en parallèle sur le lac à la Truite, à Orford, le matin puis l\'après-midi. La station Windfinder du lac Memphrémagog donne des vents cohérents avec ce que nous observons : environ 2 m/s le matin, 3 à 4 m/s l\'après-midi. Les tubes de Pitot, eux, affichent 10 m/s : sous 2 à 3 m/s, ils ne sont pas fiables.',
-      'Les nénuphars freinent certaines ailes, une autre finit sous un ponton. Un script Matlab, écrit avec Richard-Alexandre, découpe désormais automatiquement les sessions grâce aux secousses et calcule les vitesses moyennes.',
+      'Avec Alexis Lussier-Desbiens et Richard-Alexandre Péloquin, nous lâchons trois ailes en parallèle sur le lac à la Truite, à Orford, le matin puis l\'après-midi. La station Windfinder du lac Memphrémagog donne des vents cohérents avec ce que nous observons : environ 2 m/s le matin, 3 à 4 m/s l\'après-midi. Les tubes de Pitot, eux, affichent 10 m/s : d\'après les essais de Bruno Chapdelaine, ils ne sont pas fiables sous 2 à 3 m/s.',
+      'Les nénuphars freinent les ailes par moments, et l\'une d\'elles finit sous un ponton. Un script Matlab, écrit avec Richard-Alexandre, découpe désormais automatiquement les sessions grâce aux secousses et calcule les vitesses moyennes.',
     ],
     result: 'Une vitesse de dérive d\'environ 0,1 m/s, soit de l\'ordre de 4 % de la vitesse du vent.',
     viz: { type: 'tracks', lake: 'truite' },
@@ -101,7 +101,7 @@ export const ENTRIES = [
     title: 'Lac Montjoie : le coefficient de 5 %',
     question: 'Le rapport se confirme-t-il par grand vent ?',
     body: [
-      'Avec Étienne Tétreault et Richard-Alexandre, trois ailes dérivent en parallèle sur le lac Montjoie, à Saint-Denis-de-Brompton, par grand soleil et grand vent : 6 m/s en moyenne d\'après la station et nos observations. Pour la première fois, un tube de Pitot donne par moments des valeurs cohérentes, autour de 6 m/s.',
+      'Avec Étienne Tétreault et Richard-Alexandre, nous laissons dériver trois ailes en parallèle sur le lac Montjoie, à Saint-Denis-de-Brompton, par grand soleil et grand vent : 6 m/s en moyenne d\'après la station et nos observations. Pour la première fois, un tube de Pitot donne par moments des valeurs cohérentes, autour de 6 m/s.',
       'Aucune algue, des trajectoires propres dans la direction du vent : les ailes avancent à 0,283, 0,298 et 0,327 m/s, soit 4,7 %, 4,97 % et 5,46 % de la vitesse du vent. La courbe ci-contre est recalculée à partir des journaux GPS d\'origine, en moyennes sur 50 secondes comme en 2017.',
     ],
     result: 'Vitesse de dérive ≈ 5 % de la vitesse du vent : le coefficient retenu par l\'algorithme.',
@@ -113,7 +113,7 @@ export const ENTRIES = [
     title: 'Ancres, panneaux et WaveGliders',
     question: 'Peut-on freiner l\'aile plutôt que la subir ?',
     body: [
-      'En parallèle, je conçois des solutions physiques : un bateau témoin à voile en fibre de verre, une ancre flottante en forme de ballon, un panneau qui freine l\'aile par rapport à l\'eau, et deux WaveGliders inspirés de ceux de Liquid Robotics, présentés par Alexis. Le premier WaveGlider, trop fragile, s\'est brisé quelques heures après son usinage.',
+      'En parallèle, je conçois des prototypes : un bateau témoin à voile en fibre de verre, qui sert de référence, une ancre flottante en forme de ballon, un panneau qui freine l\'aile en prenant appui sur l\'eau, et deux WaveGliders inspirés de celui de Liquid Robotics, que m\'avait présenté Alexis. Un tout premier WaveGlider, trop fragile, s\'était brisé quelques heures seulement après son usinage.',
       'Pour ranger une ancre dans l\'aile, je dessine aussi un système de déploiement à croisillons, imprimé sur la MarkForged et découpé à la Trotec, commandé depuis le contrôleur de vol par mon application « ancre ».',
     ],
     result: 'Une ancre déployée en 30 secondes, et une gamme de prototypes prêts à être testés.',
@@ -126,9 +126,9 @@ export const ENTRIES = [
     question: 'Les prototypes résistent-ils au vent ?',
     body: [
       'Dernier essai, sur le lac Montjoie, pour mesurer la capacité des prototypes à lutter contre le vent. Ce jour-là, pas de vagues et un vent de 1 m/s au plus à l\'anémomètre : impossible de conclure sur les systèmes anti-dérive.',
-      'Les trois ailes de dérive, elles, ajoutent des points au tableau des coefficients : entre 0,06 et 0,09 m/s pour 1 m/s de vent, au-dessus de la droite à 5 %. Par vent aussi faible, une estimation du vent au mètre par seconde près pèse lourd. D\'autres essais devaient suivre pour caractériser les systèmes anti-dérive.',
+      'Les trois ailes de dérive, elles, ajoutent des points au tableau des coefficients : entre 0,06 et 0,09 m/s pour 1 m/s de vent, au-dessus de la droite à 5 %. Par vent aussi faible, une incertitude d\'un mètre par seconde sur le vent pèse lourd. D\'autres essais devaient suivre pour caractériser les systèmes anti-dérive.',
     ],
-    result: 'Le modèle à 5 % tient sur les essais de 2 et 6 m/s ; les vents très faibles restent à caractériser.',
+    result: 'Le modèle à 5 % tient pour des vents de 2 à 6 m/s ; les vents très faibles restent à caractériser.',
     viz: { type: 'chart', chart: 'coef' },
     media: [],
   },
@@ -157,16 +157,16 @@ export const TILES = [
 ];
 
 export const TEAM = [
-  { name: 'Dragan Tutić', role: 'Maître de stage, cofondateur d\'Oneka Technologies', text: 'Qui m\'a permis de vivre cette expérience.' },
+  { name: 'Dragan Tutić', role: 'Maître de stage, cofondateur d\'Oneka Technologies', text: 'Pour m\'avoir permis de vivre cette expérience.' },
   { name: 'Alexis Lussier-Desbiens', role: 'Responsable du projet SUWAVE, 3IT', text: 'Pour ses innombrables aides et conseils au quotidien.' },
-  { name: 'Richard-Alexandre Péloquin', role: 'Mécanique, redressement de l\'hélice, pilote d\'essais', text: 'Coauteur du script Matlab d\'analyse et compagnon de tous les essais.' },
+  { name: 'Richard-Alexandre Péloquin', role: 'Mécanique, redressement de l\'hélice, pilote d\'essais', text: 'Coauteur du script Matlab d\'analyse et compagnon des essais sur le terrain.' },
   { name: 'Étienne Tétreault', role: 'Profil d\'aile et encapsulation des composants' },
   { name: 'Gabriel Guilmain', role: 'Contrôle automatique : décollage, atterrissage, veille' },
   { name: 'Vincent Rhéaume', role: 'Électronique', text: 'Pour l\'adaptation des nouveaux capteurs de pression des tubes de Pitot.' },
   { name: 'Jean-Marie Normand', role: 'Professeur référent, École Centrale de Nantes' },
   { name: 'Paul Asquin', role: 'Stagiaire : étude de la dérive', text: 'Essais, programme d\'anticipation, prototypes anti-dérive.', me: true },
 ];
-export const THANKS = 'Merci aussi à John Bass, Bruno Chapdelaine, Dino Mehanovic et Thomas Robichaud-Courteau, rencontrés au 3IT, à Charles-Alexis Carrier pour ses notes de stage, et aux anciens stagiaires du projet GEGI.';
+export const THANKS = 'Merci aussi à John Bass pour son aide tout au long du stage, à Bruno Chapdelaine, Dino Mehanovic et Thomas Robichaud-Courteau, rencontrés au 3IT, à Charles-Alexis Carrier pour son rapport et ses notes de stage, et aux anciens stagiaires du projet GEGI.';
 
 export const SOURCES = [
   { title: 'Rapport de stage « Étude et solutions pour la dérive d\'une aile volante, solaire et aquatique »', note: 'Paul Asquin, été 2017' },
@@ -191,7 +191,7 @@ export const CHARTS = {
     x: { label: fr ? 'vent (m/s)' : 'wind (m/s)', min: 0, max: 7, ticks: [0, 1, 2, 3, 4, 5, 6, 7], unit: 'm/s', d: 0 },
     y: { label: fr ? 'dérive (m/s)' : 'drift (m/s)', min: 0, max: 0.36, ticks: [0, 0.1, 0.2, 0.3], unit: 'm/s', d: 3 },
     series: [
-      { name: fr ? 'modèle : 5 % du vent' : 'model: 5 % of the wind', color: '#7c88a1', data: [[0, 0], [7, 0.35]], dash: '5 4' },
+      { name: fr ? 'modèle : 5 % du vent' : 'model: 5% of the wind', color: '#7c88a1', data: [[0, 0], [7, 0.35]], dash: '5 4' },
       { name: fr ? 'sessions de 2017' : '2017 sessions', color: '#67d8d0', data: COEFS.map((c) => [c.wind, c.drift]).sort((a, b) => a[0] - b[0]), dots: true, line: false },
     ],
   }),
