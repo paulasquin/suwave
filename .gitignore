@@ -1,9 +1,9 @@
-video/*.mp4
-video/*.wav
-video/*.ass
-video/spec.png
-video/fonts/
-video/out/
 modal/shots/
 modal/mobile/
+video/clean.mp4
+video/shots_*.mp4
+video/music.wav
+video/out/
+video/fonts/
+video/captions_*.ass
 __pycache__/

@@ -570,3 +570,5 @@ input[type=range]::-moz-range-thumb { background: var(--plasma); box-shadow: 0 0
   .panel-lab { min-height: 200vh; }
 }
 @media (max-width: 560px) { .team { grid-template-columns: 1fr; } .lab-out { grid-template-columns: 1fr 1fr; } .lab-out div:last-child { grid-column: 1 / -1; } }
+.section-tiles .tiles { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+.section-tiles .tile-year { font-size: clamp(20px, 1.7vw, 25px); overflow-wrap: anywhere; }

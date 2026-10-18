@@ -16,7 +16,7 @@ image = (
     .run_commands("playwright install --with-deps chromium")
     .env({"NVIDIA_DRIVER_CAPABILITIES": "all"})
 )
-app = modal.App("kit-video-capture", image=image)
+app = modal.App("suwave-video-capture", image=image)
 
 FPS = 30
 W, H = 1080, 1920
@@ -28,11 +28,16 @@ W, H = 1080, 1920
 #   restart      restart the act's wall-clock intro at the start of the shot (act.t0),
 #                restartAt ms into it
 SHOTS = [
-    (0.0, 5.0, "intro", 0.00, 0.30, "linear", {"restart": True}),
-    (5.0, 7.5, "intro", 0.30, 1.00, "in", {}),
-    (7.5, 15.0, "model", 0.00, 0.33, "linear", {"zoom": 1.3}),
-    (15.0, 22.5, "model", 0.40, 0.70, "inout", {"zoom": 1.3}),
-    (22.5, 30.0, "model", 0.70, 1.00, "out", {"zoom": 1.2}),
+    (0.0, 5.0, "lake", 0.00, 0.16, "linear", {"restart": True, "restartAt": 1200}),
+    (5.0, 10.0, "lake", 0.22, 0.47, "linear", {}),               # touchdown at 9.0 s
+    (10.0, 12.5, "lake", 0.50, 0.60, "linear", {"zoom": 1.1}),
+    (12.5, 15.0, "wing", 0.05, 0.24, "linear", {"zoom": 1.15}),
+    (15.0, 17.5, "wing", 0.52, 0.62, "out", {"zoom": 1.1}),
+    (17.5, 20.0, "drift", 0.03, 0.19, "linear", {}),
+    (20.0, 22.5, "drift", 0.46, 0.58, "linear", {}),
+    (22.5, 25.0, "drift", 0.60, 0.78, "linear", {}),            # landing at the chosen point ~23.0 s
+    (25.0, 27.5, "anchor", 0.72, 0.95, "inout", {"zoom": 1.1}),
+    (27.5, 30.0, "lake", 0.02, 0.08, "linear", {"restart": True, "restartAt": 6000}),
 ]
 
 CLOCK = """(() => {
