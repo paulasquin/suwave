@@ -304,7 +304,9 @@ export class Labels {
       else if (left && x - ew < 8) left = false;
       it.el.classList.toggle('left', left);
       const off = left ? -ew + 5 : -5;
-      it.el.style.transform = `translate(${(x + off).toFixed(1)}px, ${(y - 10).toFixed(1)}px)`;
+      // Narrow screens: when neither side fits, keep the label inside the viewport.
+      const tx = Math.min(w - ew - 4, Math.max(4, x + off));
+      it.el.style.transform = `translate(${tx.toFixed(1)}px, ${(y - 10).toFixed(1)}px)`;
       it.el.style.visibility = behind ? 'hidden' : 'visible';
     }
   }
