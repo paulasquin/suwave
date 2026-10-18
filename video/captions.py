@@ -73,9 +73,9 @@ def ending(start, end, title, sub, url):
 # ACCENT colours what follows; WHITE switches back.
 TEXT = {
     "fr": [
-        (0.4, 4.8, dict(kicker="QUÉBEC · ÉTÉ 2017", big="Un drone solaire\nqui se pose\nsur les lacs", dy=-60)),
-        (5.2, 9.6, dict(big=f"Il recharge\n{ACCENT}3 h{WHITE} au soleil…")),
-        (10.0, 12.3, dict(big="…et le vent\nl'emporte")),
+        (0.4, 4.8, dict(kicker="QUÉBEC · ÉTÉ 2017", big="Un drone solaire\nqui se pose\nsur les lacs", dy=40)),
+        (5.2, 9.6, dict(big="Il se pose\npour recharger")),
+        (10.0, 12.3, dict(big=f"{ACCENT}3 h{WHITE} au soleil…\net le vent\nl'emporte")),
         (12.6, 14.8, dict(kicker="L'AILE", big="Taillée\nau fil chaud")),
         (15.1, 17.3, dict(big="PixHawk, GPS,\ntélémétrie")),
         (17.6, 19.8, dict(kicker="16 AOÛT 2017", big=f"Elle dérive à\n{ACCENT}5 %{WHITE} du vent")),
@@ -85,12 +85,12 @@ TEXT = {
         ("end", f"prévoir\n{ACCENT}la dérive", "Tout le projet en 3D", "suwave.paulasquin.com"),
     ],
     "en": [
-        (0.4, 4.8, dict(kicker="QUÉBEC · SUMMER 2017", big="A solar drone\nthat lands\non lakes", dy=-60)),
-        (5.2, 9.6, dict(big=f"It recharges for\n{ACCENT}3 h{WHITE} in the sun…")),
-        (10.0, 12.3, dict(big="…while the wind\ncarries it away")),
+        (0.4, 4.8, dict(kicker="QUÉBEC · SUMMER 2017", big="A solar drone\nthat lands\non lakes", dy=40)),
+        (5.2, 9.6, dict(big="It lands\nto recharge")),
+        (10.0, 12.3, dict(big=f"{ACCENT}3 h{WHITE} in the sun…\nwhile the wind\npushes it away")),
         (12.6, 14.8, dict(kicker="THE WING", big="Cut with\na hot wire")),
         (15.1, 17.3, dict(big="PixHawk, GPS,\ntelemetry")),
-        (17.6, 19.8, dict(kicker="16 AUGUST 2017", big=f"It drifts at\n{ACCENT}5 %{WHITE} of the wind")),
+        (17.6, 19.8, dict(kicker="16 AUGUST 2017", big=f"It drifts at\n{ACCENT}5%{WHITE} of the wind")),
         (20.1, 22.3, dict(kicker="MY PROGRAM", big="Finding room\non the lake")),
         (22.6, 24.8, dict(big="Land upwind,\ndrift in safety")),
         (25.1, 27.3, dict(kicker="THE ANCHOR", number="30 s", sub="to deploy it", dy=80)),

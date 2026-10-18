@@ -5,7 +5,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 python3 captions.py >/dev/null
 mkdir -p out
-for spec in "fr:video-fr" "en:video-en"; do
+for spec in "fr:suwave-teaser-fr" "en:suwave-teaser-en"; do
   lang=${spec%%:*}; name=${spec#*:}
   ffmpeg -hide_banner -loglevel error -y -i clean.mp4 -i music.wav \
     -filter_complex "[0:v]ass=captions_${lang}.ass:fontsdir=fonts/static,format=yuv420p[v]" \
