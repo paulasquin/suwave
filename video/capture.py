@@ -1,8 +1,10 @@
 """Render the 3D acts of a kit site frame by frame on an ephemeral Modal GPU,
 1080x1920 at 30 fps, with a virtual clock so every frame is deterministic.
-The site must be deployed (the capture loads it with ?capture: full quality, UI hidden).
+The capture loads the site with ?capture (full quality, UI hidden): the deployed site, or with
+--local this working copy, served inside the container (render fixes before deploying them).
 
     MODAL_PROFILE=photomate modal run capture.py --url "https://example.paulasquin.com/?capture&lang=fr"
+    MODAL_PROFILE=photomate modal run capture.py --local --url "?capture&lang=fr"
     MODAL_PROFILE=photomate modal run capture.py --only 3,4   # re-render some shots, splice with ffmpeg
 
 Output: clean.mp4 (3D only, no text, no music) or shots_3-4.mp4.
@@ -15,6 +17,7 @@ image = (
     .pip_install("playwright==1.55.0")
     .run_commands("playwright install --with-deps chromium")
     .env({"NVIDIA_DRIVER_CAPABILITIES": "all"})
+    .add_local_dir("..", "/site", ignore=[".git", "video", "modal", "tools", "**/__pycache__"])
 )
 app = modal.App("suwave-video-capture", image=image)
 
@@ -32,7 +35,7 @@ SHOTS = [
     (5.0, 10.0, "lake", 0.22, 0.47, "linear", {}),               # touchdown at 9.0 s
     (10.0, 12.5, "lake", 0.50, 0.60, "linear", {"zoom": 1.1}),
     (12.5, 15.0, "wing", 0.05, 0.24, "linear", {"zoom": 1.15}),
-    (15.0, 17.5, "wing", 0.52, 0.62, "out", {"zoom": 1.1}),
+    (15.0, 17.5, "wing", 0.78, 0.99, "linear", {"zoom": 0.85}),   # motor up on its pivot, vertical take-off
     (17.5, 20.0, "drift", 0.03, 0.19, "linear", {}),
     (20.0, 22.5, "drift", 0.46, 0.58, "linear", {}),
     (22.5, 25.0, "drift", 0.60, 0.78, "linear", {}),            # landing at the chosen point ~23.0 s
@@ -68,9 +71,12 @@ def ease(k, t):
     return t
 
 @app.function(gpu="L4", cpu=8, memory=16384, timeout=3600)
-def render(url: str, only: str = "") -> bytes:
+def render(url: str, only: str = "", local: bool = False) -> bytes:
     keep = {int(x) for x in only.split(",") if x}
     import asyncio, subprocess, pathlib
+    if local:
+        subprocess.Popen(["python3", "-m", "http.server", "8000", "--bind", "127.0.0.1", "--directory", "/site"])
+        url = "http://127.0.0.1:8000/" + url.split("/")[-1]
     from playwright.async_api import async_playwright
     out = pathlib.Path("/tmp/frames"); out.mkdir()
     async def main():
@@ -109,8 +115,8 @@ def render(url: str, only: str = "") -> bytes:
     return pathlib.Path("/tmp/clean.mp4").read_bytes()
 
 @app.local_entrypoint()
-def main(url: str = "https://example.paulasquin.com/?capture", only: str = ""):
-    data = render.remote(url, only)
+def main(url: str = "https://example.paulasquin.com/?capture", only: str = "", local: bool = False):
+    data = render.remote(url, only, local)
     name = "clean.mp4" if not only else f"shots_{only.replace(',', '-')}.mp4"
     open(name, "wb").write(data)
     print(name, len(data) // 1024, "KiB")

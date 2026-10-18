@@ -9,6 +9,7 @@ All three parts share one grid: **96 BPM, one bar = 2.5 s, one shot per bar** (`
 #    and drives the acts frame by frame on a virtual clock (deterministic, no dropped frames).
 MODAL_PROFILE=photomate modal run capture.py --url "https://<site>/?capture&lang=fr"     # clean.mp4, ~15 min on an L4
 MODAL_PROFILE=photomate modal run capture.py --url "…" --only 3,4                         # re-render shots 3 and 4
+MODAL_PROFILE=photomate modal run capture.py --local --url "?capture&lang=fr"           # this working copy, before deploying
 ffmpeg -i clean.mp4 -i shots_3-4.mp4 -filter_complex "[0:v]trim=end_frame=<a>,setpts=PTS-STARTPTS[a];[1:v]trim=end_frame=<n>,setpts=PTS-STARTPTS[b];[0:v]trim=start_frame=<a+n>,setpts=PTS-STARTPTS[c];[a][b][c]concat=n=3:v=1[v]" -map "[v]" -c:v libx264 -crf 14 -pix_fmt yuv420p spliced.mp4
 
 # 2. Music (no licence involved).
