@@ -1,0 +1,46 @@
+// Project strings: scripts (ui, both languages) and the English version of the
+// static HTML (static, keyed by data-i18n). Registered in main.js.
+export const STRINGS = {
+  ui: {
+    fr: {
+      'demo.label.exit': 'Sortie de tuyère',
+      'demo.label.flange': 'Bride et boulons',
+      'demo.label.throat': 'Col',
+      'demo.label.bell': 'Divergent',
+    },
+    en: {
+      'demo.label.exit': 'Nozzle exit',
+      'demo.label.flange': 'Flange and bolts',
+      'demo.label.throat': 'Throat',
+      'demo.label.bell': 'Bell',
+    },
+  },
+  static: {
+    'meta.title': 'Showcase kit — scroll-driven 3D project pages',
+    'meta.description': 'A template for telling a project with scroll-driven 3D scenes, a bilingual journal and a vertical video.',
+    loader: 'Loading the scene…',
+    'nav.aria': 'Main navigation',
+    brand: 'Showcase kit',
+    'nav.story': 'Story', 'nav.model': 'Model', 'nav.journal': 'Journal', 'nav.results': 'Results', 'nav.kit': 'Kit',
+    'hero.eyebrow': 'Template · scroll-driven 3D',
+    'hero.t1': 'Project',
+    'hero.t2': 'showcase',
+    'hero.sub': 'Tell a project with 3D scenes that follow the scroll, a bilingual journal and real data.',
+    'hero.k1': 'acts', 'hero.k2': 'languages', 'hero.k3': 'frames per second',
+    'hero.cta1': 'Read the story', 'hero.cta2': 'See the model',
+    'hero.scroll': 'Scroll',
+    'i1.k': 'Act · 01', 'i1.h': 'Each act is a 3D scene.', 'i1.p': 'Its section of the page is a track: scrolling through it drives the camera, the effects and the labels from 0 to 1.',
+    'i2.k': 'Act · 02', 'i2.h': 'Cards ride on top.', 'i2.p': 'Each panel holds a card that fades in, holds and fades out, while the scene frames its subject on the opposite side.',
+    'story.k': 'The story', 'story.h': 'Plain sections<br><em>between the acts.</em>',
+    'story.lead': 'Between two acts, ordinary sections take over: text, timeline, photo strip. The 3D stage fades out and stops rendering.',
+    'story.p': 'Everything below is rendered from content.js and content.en.js.',
+    'm1.k': 'The model · 01', 'm1.h': 'Printed layer by layer', 'm1.p': 'A GLB loaded from assets/models, revealed with layerReveal() from kit/fx.js.', 'm1.layer': 'layer',
+    'm2.k': 'The model · 02', 'm2.h': 'Labels on the part', 'm2.p': 'HTML labels anchored to points of the mesh, kept on screen and hidden behind the camera.',
+    'm3.k': 'The model · 03', 'm3.h': 'Turntable', 'm3.p': 'The camera frames the subject opposite the card; in portrait it lifts it above the cards.',
+    'jn.k': 'Journal', 'jn.h': 'Entries with<br><em>live visualisations.</em>', 'jn.lead': 'Charts and 3D viewers are built only when they come into view.',
+    'res.k': 'Results', 'res.h': 'Numbers that<br><em>count up.</em>', 'res.lead': 'Stat grid and bar comparison, linear or logarithmic.',
+    'kit.k': 'Under the hood', 'kit.h': 'Four building<br><em>blocks.</em>',
+    'foot.1': 'Showcase kit · Paul Asquin',
+    'lb.aria': 'Enlarged photo', 'lb.close': 'Close', 'lb.prev': 'Previous photo', 'lb.next': 'Next photo',
+  },
+};

@@ -1,0 +1,9 @@
+video/*.mp4
+video/*.wav
+video/*.ass
+video/spec.png
+video/fonts/
+video/out/
+modal/shots/
+modal/mobile/
+__pycache__/
