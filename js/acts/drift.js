@@ -69,6 +69,47 @@ function rectFill(color, opacity) {
 }
 const setRect = (m, x, y, w, h) => { m.position.set(x + w / 2, Y, -(y - h / 2)); m.scale.set(w, h, 1); };
 
+/** A flat arrow on the water, from (x0, y0) to (x1, y1) in the lake frame: shaft + fixed-size head. */
+function arrow(color, opacity = 1) {
+  const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity, depthTest: false, depthWrite: false });
+  const shaft = new THREE.Mesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), mat);
+  const hs = new THREE.Shape();
+  hs.moveTo(0, -0.5); hs.lineTo(1, 0); hs.lineTo(0, 0.5); hs.lineTo(0, -0.5);
+  const head = new THREE.Mesh(new THREE.ShapeGeometry(hs).rotateX(-Math.PI / 2), mat);
+  const g = new THREE.Group();
+  g.add(shaft, head);
+  g.renderOrder = shaft.renderOrder = head.renderOrder = 27;
+  g.userData = { shaft, head, mat };
+  return g;
+}
+function setArrow(g, x0, y0, x1, y1, width, headLen) {
+  const len = Math.hypot(x1 - x0, y1 - y0);
+  g.visible = len > 1;
+  if (!g.visible) return;
+  const hl = Math.min(headLen, len * 0.6), sl = len - hl;
+  g.position.set(x0, Y + 1.5, -y0);
+  g.rotation.set(0, Math.atan2(y1 - y0, x1 - x0), 0);
+  const { shaft, head } = g.userData;
+  shaft.scale.set(sl, 1, width);
+  shaft.position.set(sl / 2, 0, 0);
+  head.scale.set(hl, 1, width * 2.6);
+  head.position.set(sl, 0, 0);
+}
+
+/** Wind field: arrows on the GEGI water grid, thinned to ~300 m apart, turned with the forecast. */
+function windField(grid) {
+  const pts = [];
+  for (const q of grid) if (pts.every((k) => Math.hypot(k[0] - q[0], k[1] - q[1]) > 300)) pts.push(q);
+  const sh = new THREE.Shape();
+  sh.moveTo(-0.5, -0.05); sh.lineTo(0.18, -0.05); sh.lineTo(0.18, -0.16); sh.lineTo(0.5, 0); sh.lineTo(0.18, 0.16); sh.lineTo(0.18, 0.05); sh.lineTo(-0.5, 0.05); sh.lineTo(-0.5, -0.05);
+  const geo = new THREE.ShapeGeometry(sh).rotateX(-Math.PI / 2);
+  const m = new THREE.InstancedMesh(geo, new THREE.MeshBasicMaterial({ color: '#e8f6ff', transparent: true, opacity: 0, depthTest: false, depthWrite: false }), pts.length);
+  m.userData.pts = pts;
+  m.renderOrder = 21;
+  m.frustumCulled = false;
+  return m;
+}
+
 /** Wind streaks: short segments travelling with the wind over the lake. */
 function windStreaks(count, box) {
   const n = Math.round(count * Math.max(0.4, QUALITY.particles));
@@ -219,17 +260,19 @@ export class DriftAct {
       const box = [Math.min(...xs) - 300, Math.min(...ys) - 300, Math.max(...xs) + 300, Math.max(...ys) + 300];
       const streaks = windStreaks(520, box);
       over.add(streaks);
-      this.cache[key] = { lake, group: land.group, over, tracks, dots, zones: zg, streaks, box, size: Math.max(box[2] - box[0], box[3] - box[1]), center: [(box[0] + box[2]) / 2, (box[1] + box[3]) / 2] };
+      const field = windField(lake.grid);
+      over.add(field);
+      this.cache[key] = { lake, group: land.group, over, tracks, dots, zones: zg, streaks, field, box, size: Math.max(box[2] - box[0], box[3] - box[1]), center: [(box[0] + box[2]) / 2, (box[1] + box[3]) / 2] };
     }
     this.world = this.cache[key];
     this.scene.add(this.world.group, this.world.over);
     // Scenario overlays (rebuilt per scenario).
     if (!this.sc) {
       this.sc = {
-        path: null, zoneU: rectLine(0, 0, 1, 1, '#ffffff', 1), zoneD: rectLine(0, 0, 1, 1, '#67d8d0', 1), fillD: rectFill('#67d8d0', 0.16), fillU: rectFill('#ffffff', 0.08), cands: new THREE.Group(),
+        path: null, vecs: new THREE.Group(), zoneU: rectLine(0, 0, 1, 1, '#ffffff', 1), zoneD: rectLine(0, 0, 1, 1, '#67d8d0', 1), fillD: rectFill('#67d8d0', 0.16), fillU: rectFill('#ffffff', 0.08), cands: new THREE.Group(),
       };
       this.sc.zoneU.material.linewidth = 2;
-      this.overlay.add(this.sc.zoneU, this.sc.zoneD, this.sc.fillD, this.sc.fillU, this.sc.cands);
+      this.overlay.add(this.sc.vecs, this.sc.zoneU, this.sc.zoneD, this.sc.fillD, this.sc.fillU, this.sc.cands);
     }
   }
 
@@ -274,6 +317,9 @@ export class DriftAct {
     sc.path = new THREE.Mesh(ribbon(res.path.map((p) => [p.x, p.y]), 9), ribbonMat('#ffd28a'));
     sc.path.position.y = Y + 0.5; sc.path.renderOrder = 25;
     this.overlay.add(sc.path);
+    // One drift vector per forecast vector (5 % x wind x time under it), chained head to tail.
+    sc.vecs.clear();
+    res.path.slice(1).forEach(() => sc.vecs.add(arrow('#ffb45e', 0)));
     const Uz = res.zoneU, Dz = res.zoneD;
     sc.zoneU.geometry.setFromPoints([[Uz.x, Uz.y], [Uz.x + Uz.w, Uz.y], [Uz.x + Uz.w, Uz.y - Uz.h], [Uz.x, Uz.y - Uz.h], [Uz.x, Uz.y]].map(([a, b]) => new THREE.Vector3(a, Y + 1, -b)));
     sc.zoneD.geometry.setFromPoints([[Dz.x, Dz.y], [Dz.x + Dz.w, Dz.y], [Dz.x + Dz.w, Dz.y - Dz.h], [Dz.x, Dz.y - Dz.h], [Dz.x, Dz.y]].map(([a, b]) => new THREE.Vector3(a, Y + 1, -b)));
@@ -372,11 +418,41 @@ export class DriftAct {
 
     // Panel 2: the forecast integrated into a drift path from the origin, then zone U.
     const sc = this.sc;
-    const pathDraw = inter ? 1 : smooth(0.15, 0.75, ph(1));
+    const pathDraw = inter ? 1 : smooth(0.2, 0.8, ph(1));
     sc.path.material.uniforms.uDraw.value = pathDraw;
     sc.path.material.uniforms.uOpacity.value = inter ? 1 : smooth(0.05, 0.2, ph(1));
     const showU = inter ? 1 : smooth(0.75, 0.95, ph(1));
     sc.zoneU.material.opacity = showU; sc.fillU.material.opacity = 0.08 * showU;
+    // The forecast as a wind field that turns at each new vector, and the drift vectors it adds up.
+    const tNow = pathDraw * res.hours * 3600;
+    let kw = 0;
+    while (kw < res.winds.length - 1 && tNow > res.path[kw + 1].t) kw++;
+    const wa = res.winds[kw], wb = res.winds[Math.min(res.winds.length - 1, kw + 1)];
+    const fw = smooth(-1800, 0, tNow - res.path[kw + 1].t);
+    const ang = Math.atan2(lerp(wa.vy, wb.vy, fw), lerp(wa.vx, wb.vx, fw));
+    const spd = lerp(Math.hypot(wa.vx, wa.vy), Math.hypot(wb.vx, wb.vy), fw);
+    const fieldOn = inter ? 0 : smooth(0.0, 0.15, ph(1)) * (1 - smooth(0.0, 0.25, ph(2)));
+    W.streaks.material.uniforms.uOpacity.value *= 1 - 0.85 * fieldOn;
+    W.field.visible = fieldOn > 0.01;
+    if (W.field.visible) {
+      W.field.material.opacity = 0.4 * fieldOn;
+      const q = new THREE.Quaternion().setFromAxisAngle(this.v.set(0, 1, 0), ang), sz = 70 + 22 * spd;
+      const m = new THREE.Matrix4(), sc3 = this.v2.set(sz, 1, sz);
+      W.field.userData.pts.forEach(([x, y], i) => {
+        const wob = 0.06 * Math.sin(t * 1.3 + x * 0.01 + y * 0.013);
+        m.compose(new THREE.Vector3(x, Y + 0.5, -y), q.clone().multiply(new THREE.Quaternion().setFromAxisAngle(this.v.set(0, 1, 0), wob)), sc3);
+        W.field.setMatrixAt(i, m);
+      });
+      W.field.instanceMatrix.needsUpdate = true;
+    }
+    const vecOn = inter ? 0 : smooth(0.1, 0.2, ph(1)) * (1 - 0.5 * smooth(0.0, 0.3, ph(2)));
+    sc.vecs.children.forEach((g, i) => {
+      const a = res.path[i], b = res.path[i + 1];
+      const g0 = clamp01((tNow - a.t) / Math.max(1, b.t - a.t));
+      setArrow(g, a.x, a.y, lerp(a.x, b.x, g0), lerp(a.y, b.y, g0), 22, 95);
+      g.userData.mat.opacity = vecOn * (g0 > 0 ? 1 : 0);
+    });
+
     // Panel 3: the GEGI grid, every zone flickering, then the chosen zone D.
     const grid = inter ? 0.35 : smooth(0.0, 0.3, ph(2)) * (1 - smooth(0.3, 0.8, ph(3)));
     W.dots.material.opacity = grid * 0.9;

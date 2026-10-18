@@ -364,6 +364,8 @@ input[type=range]::-moz-range-thumb { width: 18px; height: 18px; border: 0; bord
 .video-play span { width: 0; height: 0; border-style: solid; border-width: 11px 0 11px 18px; border-color: transparent transparent transparent #fff; margin-left: 5px; }
 .video-cap { position: absolute; left: 14px; bottom: 10px; margin: 0; font-family: var(--f-mono); font-size: 11px; color: var(--ink); text-shadow: 0 1px 6px #000; }
 .video.playing .video-play, .video.playing .video-cap, .video.playing img { display: none; }
+.video-short { aspect-ratio: 9 / 16; width: min(100%, 340px); justify-self: center; border-radius: 22px; box-shadow: 0 30px 80px -30px rgba(255, 180, 94, .25); }
+.video-short .video-cap { right: 14px; bottom: 14px; }
 
 /* defence */
 .section-alt { background: radial-gradient(ellipse 60% 40% at 90% 20%, rgba(103, 216, 208, .06), transparent 60%), var(--bg-2); }

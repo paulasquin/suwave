@@ -2,7 +2,7 @@
 // acts, card reveals, counters, navigation, lightbox, video embeds, hero intro
 // and the boot sequence. Projects call these from their main.js.
 import * as THREE from 'three';
-import { nf } from './i18n.js';
+import { nf, LANG } from './i18n.js';
 
 export const $ = (s, r = document) => r.querySelector(s);
 export const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -180,6 +180,8 @@ export function setupLightbox() {
 /** <div class="video" data-yt="ID" data-title="…"> with a .video-play button: privacy-friendly YouTube embed on click. */
 export function setupVideo() {
   $$('.video[data-yt]').forEach((v) => {
+    // A film per language: data-yt-en / data-title-en replace the defaults on the English page.
+    if (LANG === 'en' && v.dataset.ytEn) { v.dataset.yt = v.dataset.ytEn; v.dataset.title = v.dataset.titleEn || v.dataset.title; }
     $('.video-play', v)?.addEventListener('click', () => {
       const f = document.createElement('iframe');
       f.src = `https://www.youtube-nocookie.com/embed/${v.dataset.yt}?autoplay=1&rel=0`;
