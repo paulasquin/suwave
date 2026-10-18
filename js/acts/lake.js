@@ -152,9 +152,14 @@ export class LakeAct {
     this.v.copy(K[i][1]).lerp(K[i + 1][1], f);
     const tg = (k) => (k[2] ? k[2] : this.drone.position);
     this.v2.copy(tg(K[i])).lerp(tg(K[i + 1]), f);
-    if (this.portrait) this.v.add(new THREE.Vector3(0.8, 0.5, 1.2).multiplyScalar(smooth(0.38, 0.5, p) * (1 - smooth(0.7, 0.85, p))));
+    if (this.portrait) this.v.lerp(this.drone.position, 0.25 * smooth(0.4, 0.5, p) * (1 - smooth(0.7, 0.85, p)));
     this.camera.position.copy(this.v);
     this.camera.lookAt(this.v2);
+    // Portrait: cards sit at the bottom, so lift the floating wing into the upper part of the frame.
+    if (this.portrait) {
+      const k = smooth(0.36, 0.46, p) * (1 - smooth(0.74, 0.86, p));
+      this.camera.setViewOffset(innerWidth, innerHeight, 0, 0.18 * innerHeight * k, innerWidth, innerHeight);
+    } else this.camera.clearViewOffset();
 
     const near = p > 0.47 && p < 0.72;
     this.labels.show(this.lab.wing, near);

@@ -196,7 +196,8 @@ export class AnchorAct {
     frameOpposite(this.camera, p, [-1, 1, -1], this.w_, this.h_, 0.15);
 
     const on = p > 0.72;
-    for (const k of ['sabot', 'servo', 'screw', 'arms', 'pin']) this.labels.show(this.lab[k], on && deploy > 0.25);
+    const keep = this.w_ < this.h_ ? ['servo', 'arms'] : ['sabot', 'servo', 'screw', 'arms', 'pin'];
+    for (const k of ['sabot', 'servo', 'screw', 'arms', 'pin']) this.labels.show(this.lab[k], on && deploy > 0.25 && keep.includes(k));
     this.labels.update(this.camera, innerWidth, innerHeight);
   }
 }

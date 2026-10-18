@@ -14,18 +14,18 @@ ScaledBorderAndShadow: yes
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: Big,Kit Unbounded Medium,64,&H00F8EEE8,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,-1,0,1,0,0,5,60,60,0,1
-Style: Kicker,Kit Mono Medium,30,&H00FFD66F,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,6,0,1,0,0,5,60,60,0,1
+Style: Kicker,Kit Mono Medium,30,&H005EB4FF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,6,0,1,0,0,5,60,60,0,1
 Style: Sub,Kit Inter Medium,38,&H00D3BFB4,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,5,60,60,0,1
-Style: Number,Kit Unbounded Medium,170,&H00FFD66F,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,-4,0,1,0,0,5,60,60,0,1
+Style: Number,Kit Unbounded Medium,170,&H005EB4FF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,-4,0,1,0,0,5,60,60,0,1
 Style: Title,Kit Unbounded Light,118,&H00F8EEE8,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,-4,0,1,0,0,5,60,60,0,1
-Style: Url,Kit Mono Medium,36,&H00FFD66F,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,2,0,1,0,0,5,60,60,0,1
+Style: Url,Kit Mono Medium,36,&H005EB4FF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,2,0,1,0,0,5,60,60,0,1
 Style: Shade,Arial,20,&H00000000,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
 
-ACCENT = r"{\c&HFFD66F&}"
+ACCENT = r"{\c&H5EB4FF&}"
 WHITE = r"{\c&HF8EEE8&}"
 
 
@@ -73,20 +73,28 @@ def ending(start, end, title, sub, url):
 # ACCENT colours what follows; WHITE switches back.
 TEXT = {
     "fr": [
-        (0.4, 4.8, dict(kicker="PROJET · 2015", big="Le titre qui\naccroche")),
-        (5.1, 7.3, dict(big="Une question\nqui intrigue ?")),
-        (7.8, 14.6, dict(kicker="LA PIÈCE", big="Imprimée en 3D,\ncouche par couche")),
-        (15.2, 22.2, dict(big=f"Le chiffre clé :\n{ACCENT}6,7 µN")),
-        (22.8, 27.3, dict(kicker="LE RÉSULTAT", number="60", sub="images par seconde", dy=80)),
-        ("end", f"projet\n{ACCENT}vitrine", "Tout le projet en 3D", "example.paulasquin.com"),
+        (0.4, 4.8, dict(kicker="QUÉBEC · ÉTÉ 2017", big="Un drone solaire\nqui se pose\nsur les lacs", dy=-60)),
+        (5.2, 9.6, dict(big=f"Il recharge\n{ACCENT}3 h{WHITE} au soleil…")),
+        (10.0, 12.3, dict(big="…et le vent\nl'emporte")),
+        (12.6, 14.8, dict(kicker="L'AILE", big="Taillée\nau fil chaud")),
+        (15.1, 17.3, dict(big="PixHawk, GPS,\ntélémétrie")),
+        (17.6, 19.8, dict(kicker="16 AOÛT 2017", big=f"Elle dérive à\n{ACCENT}5 %{WHITE} du vent")),
+        (20.1, 22.3, dict(kicker="MON PROGRAMME", big="Trouver la place\nsur le lac")),
+        (22.6, 24.8, dict(big="Se poser au vent,\ndériver à l'abri")),
+        (25.1, 27.3, dict(kicker="L'ANCRE", number="30 s", sub="pour la déployer", dy=80)),
+        ("end", f"prévoir\n{ACCENT}la dérive", "Tout le projet en 3D", "suwave.paulasquin.com"),
     ],
     "en": [
-        (0.4, 4.8, dict(kicker="PROJECT · 2015", big="A hook\nof a title")),
-        (5.1, 7.3, dict(big="A question that\nmakes you curious?")),
-        (7.8, 14.6, dict(kicker="THE PART", big="3D-printed,\nlayer by layer")),
-        (15.2, 22.2, dict(big=f"The key figure:\n{ACCENT}6.7 µN")),
-        (22.8, 27.3, dict(kicker="THE RESULT", number="60", sub="frames per second", dy=80)),
-        ("end", f"project\n{ACCENT}showcase", "The whole project in 3D", "example.paulasquin.com"),
+        (0.4, 4.8, dict(kicker="QUÉBEC · SUMMER 2017", big="A solar drone\nthat lands\non lakes", dy=-60)),
+        (5.2, 9.6, dict(big=f"It recharges for\n{ACCENT}3 h{WHITE} in the sun…")),
+        (10.0, 12.3, dict(big="…while the wind\ncarries it away")),
+        (12.6, 14.8, dict(kicker="THE WING", big="Cut with\na hot wire")),
+        (15.1, 17.3, dict(big="PixHawk, GPS,\ntelemetry")),
+        (17.6, 19.8, dict(kicker="16 AUGUST 2017", big=f"It drifts at\n{ACCENT}5 %{WHITE} of the wind")),
+        (20.1, 22.3, dict(kicker="MY PROGRAM", big="Finding room\non the lake")),
+        (22.6, 24.8, dict(big="Land upwind,\ndrift in safety")),
+        (25.1, 27.3, dict(kicker="THE ANCHOR", number="30 s", sub="to deploy it", dy=80)),
+        ("end", f"predict\n{ACCENT}the drift", "The whole project in 3D", "suwave.paulasquin.com"),
     ],
 }
 
